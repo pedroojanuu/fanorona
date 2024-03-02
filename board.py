@@ -62,13 +62,19 @@ class Board:
 
         print(self.board)
 
+    def inside_board(self, r: int, c: int):
+        return r >= 0 and r < self.height and c >= 0 and c < self.width
 
     def get_adjacent(self, r: int, c: int):
-        # # #
-        # X #
-        # # #
-        dr = [1, 1, 0, 0, -1, -1]
-        dc = [0, 1, 1, -1, 0, -1]
+        dr = [1, -1, 0, 1, -1, 0, 1, -1]
+        dc = [0, 0, 1, 1, 1, -1, -1, -1]
+        for i in range(8):
+            r2 = r + dr[i]
+            c2 = c + dc[i]
+            r3 = r2 + dr[i]
+            c3 = c2 + dc[i]
+            if self.inside_board(r2, c2) and self.inside_board(r3, c3):
+                yield (r2, c2, r3, c3)
 
 
 
@@ -76,12 +82,10 @@ class Board:
         moves = []
         pieces = np.argwhere(self.board == player)
         for [r, c] in pieces:
-            for r2, c2, r3, c3 in get_adjacent(r, c):
+            for r2, c2, r3, c3 in self.get_adjacent(r, c):
                 if self.board[r2][c2] == PlayerEnum.EMPTY and self.board[r3][c3] == opponent_player(player):
                     moves.append((r, c, r2, c2))
 
-            
-        
         # Capturing moves
         if moves:
             return []

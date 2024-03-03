@@ -11,10 +11,22 @@ class PlayerEnum(Enum):
     WHITE = 2
 
     def __str__(self):
-        return self.name
+        match self:
+            case PlayerEnum.EMPTY:
+                return "EMPTY"
+            case PlayerEnum.BLACK:
+                return '\033[94m' + "BLACK" + '\033[0m'
+            case PlayerEnum.WHITE:
+                return '\033[93m' + "WHITE" + '\033[0m'
     
     def __repr__(self):
-        return self.name
+        match self:
+            case PlayerEnum.EMPTY:
+                return " "
+            case PlayerEnum.BLACK:
+                return "B"
+            case PlayerEnum.WHITE:
+                return "W"
 
 def opponent_player(player):
     if player == PlayerEnum.BLACK:
@@ -109,7 +121,7 @@ class Board:
             if self.inside_board(r2, c2):
                 yield (r2, c2)
 
-    def moves(self, player: PlayerEnum):
+    def get_all_moves(self, player: PlayerEnum):
         moves = []
         pieces = np.argwhere(self.board == player)
         for [r, c] in pieces:

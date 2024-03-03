@@ -18,3 +18,6 @@ class Move:
     
     def __repr__(self):
         return f"({self.row_origin}, {self.col_origin}) -> ({self.row_destination}, {self.col_destination}, {self.type})"
+    
+    def get_destination(self):
+        return (self.row_destination, self.col_destination)

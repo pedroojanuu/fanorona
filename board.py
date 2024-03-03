@@ -128,6 +128,18 @@ class Board:
                         moves.append(Move(r, c, r2, c2, TypeOfMove.FREE))
                     
         return moves
+    
+    def get_tile_moves(self, r: int, c: int):
+        moves = []
+        for r2, c2, r3, c3 in self.get_adjacent_aproach(r, c):
+            if self.board[r2][c2] == PlayerEnum.EMPTY and self.board[r3][c3] == opponent_player(self.board[r][c]):
+                moves.append(Move(r, c, r2, c2, TypeOfMove.APPROACH))
+                
+        for r2, c2, r3, c3 in self.get_adjacent_withdrawal(r, c):
+            if self.board[r2][c2] == PlayerEnum.EMPTY and self.board[r3][c3] == opponent_player(self.board[r][c]):
+                moves.append(Move(r, c, r2, c2, TypeOfMove.WITHDRAWAL))
+                    
+        return moves
 
     def set_place(self, r: int, c: int, player: PlayerEnum):
         self.board[r][c] = player

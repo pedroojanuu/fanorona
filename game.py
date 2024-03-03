@@ -11,8 +11,3 @@ class Game:
     def play(self):
         pass
 
-def opponent_player(player):
-    if player == PlayerEnum.BLACK:
-        return PlayerEnum.WHITE
-    return PlayerEnum.BLACK
-

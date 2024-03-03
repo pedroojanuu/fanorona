@@ -43,9 +43,9 @@ class State:
             self.change_player()
     
     def check_winner(self):
-        if np.count_nonzero(self.get_board_matrix() == 1) == 0:
+        if np.count_nonzero(self.get_board_matrix() == PlayerEnum.BLACK) == 0:
             return PlayerEnum.WHITE
-        if np.count_nonzero(self.get_board_matrix() == 2) == 0:
+        if np.count_nonzero(self.get_board_matrix() == PlayerEnum.WHITE) == 0:
             return PlayerEnum.BLACK
         return PlayerEnum.EMPTY
     

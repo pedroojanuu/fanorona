@@ -62,6 +62,8 @@ class Board:
 
     def can_move_in_diagonal(self, r: int, c: int):
         return (r + c) % 2 == 0
+    def get_pieces(self, player: PlayerEnum):
+        return np.argwhere(self.board == player)
 
     def get_adjacent_aproach(self, r: int, c: int):
         if self.can_move_in_diagonal(r, c):
@@ -111,7 +113,7 @@ class Board:
 
     def moves(self, player: PlayerEnum):
         moves = []
-        pieces = np.argwhere(self.board == player)
+        pieces = self.get_pieces(player)
         for [r, c] in pieces:
             for r2, c2, r3, c3 in self.get_adjacent_aproach(r, c):
                 if self.board[r2][c2] == PlayerEnum.EMPTY and self.board[r3][c3] == opponent_player(player):

@@ -1,5 +1,7 @@
-import state
+from heuristics.AdjacentPiecesHeuristic import AdjacentPiecesHeuristic
+from heuristics.HeuristicList import HeuristicList
 
+from board import Board, opponent_player, PlayerEnum
 class Game:
     def __init__(self):
         self.board = Board()

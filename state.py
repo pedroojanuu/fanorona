@@ -17,7 +17,7 @@ class State:
     def in_move_log(self, move: Move):
         if self.move_log == []:
             return False
-        return move.get_destination() == self.move_log[0].get_origin() or map(lambda x: x.get_destination() == move.get_destination(), self.move_log)
+        return move.get_destination() == self.move_log[0].get_origin() or all(map(lambda x: x.get_destination() == move.get_destination(), self.move_log))
 
     def get_available_moves(self):
         if self.move_log == []:
@@ -62,8 +62,6 @@ class State:
 
         self.move_log.append(move)
 
-        print(self.get_available_moves())
-
         if self.get_available_moves() == []:
             self.change_player()
             self.move_log.clear()
@@ -84,8 +82,8 @@ if __name__ == '__main__':
     s = State()
     s.draw()
 
-    start_move = Move(2, 3, 2, 4, TypeOfMove.WITHDRAWAL)
     print()
+    start_move = Move(2, 3, 2, 4, TypeOfMove.WITHDRAWAL)
     print("Move to execute: ", start_move)
 
     print()
@@ -94,32 +92,3 @@ if __name__ == '__main__':
 
     s.execute_move(start_move)
     s.draw()
-
-    for i in range(20):
-        # print("Available moves: ", s.board.get_available_moves(s.player))
-        move_to_exe = s.get_available_moves()[0]
-        print()
-        print("Move to execute: ", move_to_exe)
-
-        print()
-        print('-'*50)
-        print()
-
-        s.execute_move(move_to_exe)
-        s.draw()
-        if s.check_winner() != PlayerEnum.EMPTY:
-            print("Winner: ", s.check_winner())
-            break
-
-    # s.change_player()
-    # s.draw()
-    # start_move = Move(3, 2, 2, 1, TypeOfMove.WITHDRAWAL)
-    # print()
-    # print("Move to execute: ", start_move)
-
-    # print()
-    # print('-'*50)
-    # print()
-
-    # s.execute_move(start_move)
-    # s.draw()

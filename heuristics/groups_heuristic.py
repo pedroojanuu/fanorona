@@ -6,7 +6,7 @@ if __name__ == "__main__":
 from heuristics.heuristic import Heuristic
 from board import opponent_player, PlayerEnum, Board
 from state import State
-from position import ADJACENT_ALL
+from adjacent_positions import ADJACENT_ALL
 import numpy as np
 
 
@@ -21,8 +21,7 @@ class GroupsHeuristic(Heuristic):
         ):
             return
         visited[row][col] = True
-        for position in ADJACENT_ALL:
-            r, c = position.value
+        for r, c in ADJACENT_ALL:
             self.flood_fill(board, row + r, col + c, player, visited)
 
     def count_groups(self, board: Board, player: PlayerEnum, visited: np.ndarray):

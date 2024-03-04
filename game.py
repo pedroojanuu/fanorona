@@ -1,5 +1,5 @@
-from heuristics.AdjacentPiecesHeuristic import AdjacentPiecesHeuristic
-from heuristics.HeuristicList import HeuristicList
+from heuristics.adjacent_pieces_heuristic import AdjacentPiecesHeuristic
+from heuristics.heuristics_list import HeuristicsList
 from state import State
 from board import PlayerEnum
 

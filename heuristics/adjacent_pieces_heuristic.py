@@ -4,7 +4,7 @@ if __name__ == "__main__":
     sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from heuristics.heuristic import Heuristic
-from position import ADJACENT_RIGHT
+from adjacent_positions import ADJACENT_RIGHT
 from state import State
 from board import opponent_player, PlayerEnum
 import numpy as np
@@ -26,8 +26,7 @@ class AdjacentPiecesHeuristic(Heuristic):
 
         max_adjacent = 0
 
-        for position in ADJACENT_RIGHT:
-            r, c = position.value
+        for r, c in ADJACENT_RIGHT:
             for row, col in pieces:
                 if visited[row][col]:
                     continue

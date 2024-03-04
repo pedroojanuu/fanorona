@@ -9,14 +9,14 @@ from board import Board, opponent_player
 import numpy as np
 from enum import Enum
 
-from heuristics.GroupsHeuristic import GroupsHeuristic, test_groups_heuristic
-from heuristics.CenterControlHeuristic import CenterControlHeuristic, test_center_control_heuristic
-from heuristics.WinHeuristic import WinHeuristic, test_win_heuristic
-from heuristics.AdjacentPiecesHeuristic import AdjacentPiecesHeuristic, test_adjacent_pieces_heuristic
-from heuristics.NrPiecesHeuristic import NrPiecesHeuristic, test_nr_pieces_heuristic
+from heuristics.groups_heuristic import GroupsHeuristic, test_groups_heuristic
+from heuristics.center_control_heuristic import CenterControlHeuristic, test_center_control_heuristic
+from heuristics.win_heuristic import WinHeuristic, test_win_heuristic
+from heuristics.adjacent_pieces_heuristic import AdjacentPiecesHeuristic, test_adjacent_pieces_heuristic
+from heuristics.nr_pieces_heuristic import NrPiecesHeuristic, test_nr_pieces_heuristic
 
 
-class HeuristicList(Heuristic):
+class HeuristicsList(Heuristic):
     def __init__(self, heuristics, weights):
         self.heuristics = heuristics
         self.weights = weights
@@ -30,7 +30,7 @@ class HeuristicList(Heuristic):
 
 def test_heuristic_list():
     s = State()
-    h = HeuristicList(
+    h = HeuristicsList(
         heuristics=np.array([
             WinHeuristic(),
             NrPiecesHeuristic(),

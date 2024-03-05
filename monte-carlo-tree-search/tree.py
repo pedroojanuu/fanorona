@@ -12,12 +12,6 @@ class MonteCarloTree:
     def __init__(self):
         self.root = MonteCarloNode(None)
         self.state = State()
-
-    def set_root_value(self, value):
-        self.root.total = value
-
-    def get_root_value(self):
-        return self.root.total
     
     def save_to_disk(self, path):
         with open(path, 'wb') as file:
@@ -27,13 +21,42 @@ class MonteCarloTree:
     def load_from_disk(path):
         with open(path,  "rb") as f:
             return pickle.load(f)
+        
+    def one_training_iteration(self):
+        node = self.root
+        move = None
+        state = self.state
+        while node.children != []:
+            node, move = node.select_child()
+            if state.execute_move(move) == None:
+                print(move)
+                state.draw()
+                print(state.get_available_moves())
+            state = state.execute_move(move)
+        if node.visits > 0:
+            node = node.expand(state)
+            winner = node.rollout(state)
+            node.backpropagate(winner)
+        else:
+            winner = node.rollout(state)
+            node.backpropagate(winner)
+
+    def print_tree(self):
+        self.print_tree_aux(self.root, 0)
+    
+    def print_tree_aux(self, node, depth):
+        print(" " * 4*depth, "t:", node.total, "v:", node.visits)
+        for child, move in node.children:
+            print(" " * depth)
+            self.print_tree_aux(child, depth + 1)
+
+    def train(self, iterations):
+        for _ in range(iterations):
+            self.one_training_iteration()
+            self.state = State()
     
 
 if __name__ == '__main__':
     mcts = MonteCarloTree()
-    mcts.set_root_value(15)
-    mcts.save_to_disk("mcts_test")
-
-    mcts2 = MonteCarloTree.load_from_disk("mcts_test")
-
-    print(mcts2.get_root_value())
+    mcts.train(2)
+    mcts.print_tree()

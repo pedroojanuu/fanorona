@@ -1,5 +1,6 @@
 from state import State
 from board import PlayerEnum
+import random
 
 class Game:
     def __init__(self):
@@ -8,9 +9,9 @@ class Game:
 def play_simulation(initial_state: State):
     initial_state.draw()
 
-    for i in range(20):
+    for i in range(50):
         # print("Available moves: ", initial_state.board.get_available_moves(initial_state.player))
-        move_to_exe = initial_state.get_available_moves()[0]
+        move_to_exe = random.choice(initial_state.get_available_moves())
         print()
         print("Move to execute: ", move_to_exe)
 

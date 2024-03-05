@@ -1,8 +1,5 @@
-import sys
-import os
-
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.dirname(SCRIPT_DIR))
+from import_from_parent import import_from_parent
+import_from_parent()
 
 from board import PlayerEnum
 import random

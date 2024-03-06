@@ -67,12 +67,12 @@ class State:
             self.move_log.clear()
     
     def check_winner(self):
-        if np.count_nonzero(self.get_board_matrix() == PlayerEnum.WHITE) == 0:
-            return PlayerEnum.WHITE
         if np.count_nonzero(self.get_board_matrix() == PlayerEnum.BLACK) == 0:
+            return PlayerEnum.WHITE
+        if np.count_nonzero(self.get_board_matrix() == PlayerEnum.WHITE) == 0:
             return PlayerEnum.BLACK
         return PlayerEnum.EMPTY
-    
+
     def draw(self):
         print("Next Player: ", self.player)
         self.board.draw()

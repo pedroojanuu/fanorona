@@ -4,7 +4,7 @@ import math
 from enum import Enum
 from move import Move, TypeOfMove
 from typing import List
-
+from adjacent_positions import ADJACENT_4, ADJACENT_ALL
 class PlayerEnum(Enum):
     EMPTY = 0
     BLACK = 1
@@ -78,14 +78,16 @@ class Board:
         return np.argwhere(self.board == player)
 
     def get_adjacent_aproach(self, r: int, c: int):
-        if self.can_move_in_diagonal(r, c):
-            dr = [1, -1, 0, 1, -1, 0, 1, -1]
-            dc = [0, 0, 1, 1, 1, -1, -1, -1]
-        else:
-            dr = [1, -1, 0,  0]
-            dc = [0,  0, 1, -1]
+        diff = ADJACENT_ALL if self.can_move_in_diagonal(r, c) else ADJACENT_4
+        # if self.can_move_in_diagonal(r, c):
+            
+        #     dr = [1, -1, 0, 1, -1, 0, 1, -1]
+        #     dc = [0, 0, 1, 1, 1, -1, -1, -1]
+        # else:
+        #     dr = [1, -1, 0,  0]
+        #     dc = [0,  0, 1, -1]
 
-        for i, j in zip(dr, dc):
+        for i, j in diff:
             r2 = r  + i
             c2 = c  + j
             r3 = r2 + i
@@ -94,14 +96,15 @@ class Board:
                 yield (r2, c2, r3, c3)
 
     def get_adjacent_withdrawal(self, r: int, c: int):
-        if self.can_move_in_diagonal(r, c):
-            dr = [1, -1, 0, 1, -1, 0, 1, -1]
-            dc = [0, 0, 1, 1, 1, -1, -1, -1]
-        else:
-            dr = [1, -1, 0,  0]
-            dc = [0,  0, 1, -1]
+        diff = ADJACENT_ALL if self.can_move_in_diagonal(r, c) else ADJACENT_4
+        # if self.can_move_in_diagonal(r, c):
+        #     dr = [1, -1, 0, 1, -1, 0, 1, -1]
+        #     dc = [0, 0, 1, 1, 1, -1, -1, -1]
+        # else:
+        #     dr = [1, -1, 0,  0]
+        #     dc = [0,  0, 1, -1]
 
-        for i, j in zip(dr, dc):
+        for i, j in diff:
             r2 = r + i
             c2 = c + j
             r3 = r - i
@@ -110,14 +113,15 @@ class Board:
                 yield (r2, c2, r3, c3)
 
     def get_adjacent_free(self, r: int, c: int):
-        if self.can_move_in_diagonal(r, c):
-            dr = [1, -1, 0, 1, -1, 0, 1, -1]
-            dc = [0, 0, 1, 1, 1, -1, -1, -1]
-        else:
-            dr = [1, -1, 0,  0]
-            dc = [0,  0, 1, -1]
+        diff = ADJACENT_ALL if self.can_move_in_diagonal(r, c) else ADJACENT_4
+        # if self.can_move_in_diagonal(r, c):
+        #     dr = [1, -1, 0, 1, -1, 0, 1, -1]
+        #     dc = [0, 0, 1, 1, 1, -1, -1, -1]
+        # else:
+        #     dr = [1, -1, 0,  0]
+        #     dc = [0,  0, 1, -1]
 
-        for i, j in zip(dr, dc):
+        for i, j in diff:
             r2 = r + i
             c2 = c + j
             if self.inside_board(r2, c2):
@@ -167,5 +171,5 @@ class Board:
 if __name__ == '__main__':
     # b = Board()
     c = Board(9, 6)
-    c.moves(PlayerEnum.BLACK)
+    print(c.get_all_moves(PlayerEnum.WHITE))
 

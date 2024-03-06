@@ -28,6 +28,16 @@ def play_simulation(initial_state: State):
             print("Winner: ", initial_state.check_winner())
             break
 
+    def run(self, ai_white, ai_black):
+        while not self.state.game_over():
+            if self.state.white_turn():
+                ai_white(self.state)
+            else:
+                ai_black(self.state)
+
+        print("Winner: ", self.state.check_winner())
+
+
 if __name__ == '__main__':
     g = Game()
     play_simulation(g.state)

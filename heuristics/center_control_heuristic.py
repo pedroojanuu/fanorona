@@ -6,13 +6,12 @@ if __name__ == "__main__":
 from heuristics.heuristic import Heuristic
 from state import State
 from board import PlayerEnum
-import numpy as np
 
 class CenterControlHeuristic(Heuristic):
     def evaluate_board(self, state, player_to_win):
         rowMiddle = state.get_board_matrix().shape[0] // 2
         colMiddle = state.get_board_matrix().shape[1] // 2
-        valueAtMiddle = state.get_board_matrix()[rowMiddle][colMiddle]
+        valueAtMiddle = state.get_board_matrix()[rowMiddle][colMiddle]  # lacks even/odd check
         if valueAtMiddle == PlayerEnum.EMPTY:
             return 0
         return 1 if valueAtMiddle == player_to_win else -1

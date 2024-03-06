@@ -1,6 +1,7 @@
 from board import Board, PlayerEnum, opponent_player
 from move import Move, TypeOfMove
 import numpy as np
+from copy import deepcopy
 
 class State:
     def __init__(self):
@@ -10,9 +11,12 @@ class State:
 
     def get_board_matrix(self):
         return self.board.board
-    
+
     def change_player(self):
         self.player = opponent_player(self.player)
+
+    def white_turn(self):
+        return self.player == PlayerEnum.WHITE
 
     def in_move_log(self, move: Move):
         if self.move_log == []:
@@ -25,13 +29,12 @@ class State:
         else:
             all_tile_moves = self.board.get_tile_moves(self.move_log[-1].row_destination, self.move_log[-1].col_destination)
             return list(filter(lambda x: not self.in_move_log(x), all_tile_moves))
-            
     
     def execute_move(self, move: Move):
         if move not in self.board.get_all_moves(self.player) and not self.in_move_log(move):
             print("Invalid move")
             return
-        self.get_board_matrix()[move.row_destination][move.col_destination] = self.get_board_matrix()[move.row_origin][move.col_origin] 
+        self.get_board_matrix()[move.row_destination][move.col_destination] = self.get_board_matrix()[move.row_origin][move.col_origin]
         self.get_board_matrix()[move.row_origin][move.col_origin] = PlayerEnum.EMPTY
 
         direction = (move.row_destination - move.row_origin, move.col_destination - move.col_origin)
@@ -72,6 +75,9 @@ class State:
         if np.count_nonzero(self.get_board_matrix() == PlayerEnum.WHITE) == 0:
             return PlayerEnum.BLACK
         return PlayerEnum.EMPTY
+
+    def game_over(self):
+        return self.check_winner() != PlayerEnum.EMPTY
 
     def draw(self):
         print("Next Player: ", self.player)

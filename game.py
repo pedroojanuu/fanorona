@@ -3,8 +3,8 @@ from board import PlayerEnum
 import random
 
 class Game:
-    def __init__(self):
-        self.state = State()
+    def __init__(self, width: int = 9, height: int = 5):
+        self.state = State(width, height)
 
 def play_simulation(initial_state: State):
     initial_state.draw()
@@ -26,5 +26,5 @@ def play_simulation(initial_state: State):
             break
 
 if __name__ == '__main__':
-    g = Game()
+    g = Game(10, 10)
     play_simulation(g.state)

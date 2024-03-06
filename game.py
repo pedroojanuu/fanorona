@@ -1,7 +1,10 @@
+from heuristics.adjacent_pieces_heuristic import AdjacentPiecesHeuristic
+from heuristics.heuristics_list import HeuristicsList
 from state import State
 from board import PlayerEnum
 import random
 
+from board import Board, opponent_player, PlayerEnum
 class Game:
     def __init__(self, width: int = 9, height: int = 5):
         self.state = State(width, height)

@@ -25,11 +25,11 @@ class MonteCarloTree:
         state = self.state
         while node.children != []:
             node, move = node.select_child()
-            if state.execute_move(move) == None:
-                print(move)
-                state.draw()
-                print(state.get_available_moves())
-            state = state.execute_move(move)
+            # if state.execute_move(move) == None:
+            #     print(move)
+            #     state.draw()
+            #     print(state.get_available_moves())
+            state.execute_move(move)
         if node.visits > 0:
             node = node.expand(state)
             winner = node.rollout(state)
@@ -55,5 +55,5 @@ class MonteCarloTree:
 
 if __name__ == '__main__':
     mcts = MonteCarloTree()
-    mcts.train(2)
+    mcts.train(1000)
     mcts.print_tree()

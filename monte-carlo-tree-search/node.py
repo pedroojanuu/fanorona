@@ -42,9 +42,14 @@ class MonteCarloNode:
     
     def expand(self, state):
         moves = state.get_available_moves()
+
         for move in moves:
             self.add_child(MonteCarloNode(self), move)
-        return random.choice(self.children)[0]
+        try:
+            return random.choice(self.children)[0]
+        except:
+            state.draw().check_winner()
+            print(self.children, moves)
     
     def rollout(self, state):
         while state.check_winner() == PlayerEnum.EMPTY:

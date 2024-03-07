@@ -13,6 +13,9 @@ class FreeMove(MotionMove):
             return super().__eq__(other)
         return False
 
+    def allows_multiple_moves(self) -> bool:
+        return False
+
     @Move.execute_decorator
     def execute(self, state):
         return super().execute(state)

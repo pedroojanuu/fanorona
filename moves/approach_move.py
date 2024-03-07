@@ -15,6 +15,9 @@ class ApproachMove(MotionMove):
             return super().__eq__(other)
         return False
 
+    def allows_multiple_moves(self) -> bool:
+        return True
+
     @Move.execute_decorator
     def execute(self, state):
         state = super().execute(state)

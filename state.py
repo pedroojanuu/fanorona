@@ -4,8 +4,6 @@ from board import Board
 from player import Player
 from moves.move import Move
 from moves.pass_move import PassMove
-from moves.approach_move import ApproachMove
-from moves.withdrawal_move import WithdrawalMove
 
 class State:
     def __init__(self, width: int = 9, height: int = 5):
@@ -13,9 +11,6 @@ class State:
         self.player = Player.WHITE
         self.move_log = []
 
-    def __str__(self):
-        return str(self.get_board_matrix()) + " " + str(self.player) + " " + str(self.move_log)
-        
     def get_board_matrix(self):
         return self.board.board
 
@@ -26,15 +21,23 @@ class State:
         self.change_player()
         self.move_log.clear()
 
+    def add_to_log(self, move):
+        self.move_log.append(move)
+
     def is_white_turn(self):
         return self.player == Player.WHITE
 
     def in_move_log(self, move: Move):
         if self.move_log == []:
             return False
+        if not move.allows_multiple_moves():
+            return False
         return move.get_destination() == self.move_log[0].get_origin() or any(map(lambda x: x.get_destination() == move.get_destination(), self.move_log))
 
     def get_available_moves(self):
+        """
+        Depending on the move log, will return normal moves or consecutive moves (only captures and pass)
+        """
         if self.move_log == []:
             return self.board.get_all_moves(self.player)
         else:
@@ -46,12 +49,15 @@ class State:
             return result
 
     def execute_move(self, move: Move) -> "State":
-        if move not in self.board.get_all_moves(self.player) and not self.in_move_log(move):
-            print("Invalid move")
-            return None
-        nstate = move.execute(self)
-        # if no possible next move, change player
-        if nstate.get_available_moves() == []:
+        """
+        Executes a move and returns the new state.
+        Assumes the move is valid
+        """
+        nstate: State = move.execute(self)
+        nstate.add_to_log(move)
+
+        # if no possible next move (no more captures), change player
+        if not move.allows_multiple_moves() or nstate.get_available_moves() == []:
             nstate.finish_turn()
         return nstate
 
@@ -107,41 +113,3 @@ class State:
         print("Next Player: ", self.player)
         self.board.draw()
         print("Move Log: ", self.move_log)
-
-
-
-def test_approach_move():
-    before = State()
-    before.get_board_matrix().fill(Player.EMPTY)
-    before.get_board_matrix()[1][0] = Player.WHITE
-    before.get_board_matrix()[2][0] = Player.BLACK
-    before.player = Player.WHITE
-
-    move = WithdrawalMove(1, 0, 0, 0)
-    print(move)
-
-    after = move.execute(before)
-
-    print("State before:")
-    print(before.get_board_matrix())
-    print("State after")
-    print(after)
-
-
-if __name__ == '__main__':
-    s = State()
-    # s.draw()
-
-    # print()
-    # start_move = WithdrawalMove(2, 3, 2, 4)
-    # print("Move to execute: ", start_move)
-
-    # print()
-    # print('-'*50)
-    # print()
-
-    # s.execute_move(start_move)
-    s.draw()
-    
-    test_approach_move()
-

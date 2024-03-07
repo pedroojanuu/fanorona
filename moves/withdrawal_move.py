@@ -7,12 +7,15 @@ class WithdrawalMove(MotionMove):
         super().__init__(row_origin, col_origin, row_destination, col_destination)
 
     def __str__(self):
-        return super().__str__() + " Free"
+        return super().__str__() + " Withdrawal"
 
     def __eq__(self, other: object):
         if isinstance(other, WithdrawalMove):
             return super().__eq__(other)
         return False
+
+    def allows_multiple_moves(self) -> bool:
+        return True
 
     @Move.execute_decorator
     def execute(self, state):

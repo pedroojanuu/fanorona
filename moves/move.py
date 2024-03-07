@@ -17,6 +17,10 @@ class Move(ABC):
         pass
 
     @abstractmethod
+    def allows_multiple_moves(self) -> bool:
+        pass
+
+    @abstractmethod
     def execute(self, state):
         pass
 

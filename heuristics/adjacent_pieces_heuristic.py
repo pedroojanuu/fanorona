@@ -6,7 +6,7 @@ if __name__ == "__main__":
 from heuristics.heuristic import Heuristic
 from adjacent_positions import ADJACENT_RIGHT
 from state import State
-from board import opponent_player, PlayerEnum
+from player import Player
 import numpy as np
 
 
@@ -45,7 +45,7 @@ class AdjacentPiecesHeuristic(Heuristic):
         return max_adjacent
 
     def evaluate_board(self, state, player_to_win):
-        adversary = opponent_player(player_to_win)
+        adversary = Player.opponent_player(player_to_win)
         max_adj_me = self.calculate_max_adjacent_pieces(state, player_to_win)
         max_adj_adv = self.calculate_max_adjacent_pieces(state, adversary)
         return (
@@ -57,14 +57,14 @@ def test_adjacent_pieces_heuristic():
     s = State()
     h = AdjacentPiecesHeuristic()
 
-    s.get_board_matrix().fill(PlayerEnum.EMPTY)  # clear the board
+    s.get_board_matrix().fill(Player.EMPTY)  # clear the board
 
-    s.get_board_matrix()[0][0:6] = PlayerEnum.BLACK
-    s.get_board_matrix()[1][0:4] = PlayerEnum.WHITE
+    s.get_board_matrix()[0][0:6] = Player.BLACK
+    s.get_board_matrix()[1][0:4] = Player.WHITE
 
     print(s.get_board_matrix())
-    white_eval = h.evaluate_board(s, PlayerEnum.WHITE)
-    black_eval = h.evaluate_board(s, PlayerEnum.BLACK)
+    white_eval = h.evaluate_board(s, Player.WHITE)
+    black_eval = h.evaluate_board(s, Player.BLACK)
     print(white_eval, black_eval)
     assert white_eval > 0, f"Expected white advantage, but got {white_eval}"
     assert black_eval < 0, f"Expected black disadvantage, but got {black_eval}"

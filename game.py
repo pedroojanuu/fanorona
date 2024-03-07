@@ -1,10 +1,9 @@
 from heuristics.adjacent_pieces_heuristic import AdjacentPiecesHeuristic
 from heuristics.heuristics_list import HeuristicsList
 from state import State
-from board import PlayerEnum
+from player import Player
 import random
 
-from board import Board, opponent_player, PlayerEnum
 class Game:
     def __init__(self, width: int = 9, height: int = 5):
         self.state = State(width, height)
@@ -24,7 +23,7 @@ def play_simulation(initial_state: State):
 
         initial_state.execute_move(move_to_exe)
         initial_state.draw()
-        if initial_state.check_winner() != PlayerEnum.EMPTY:
+        if initial_state.check_winner() != Player.EMPTY:
             print("Winner: ", initial_state.check_winner())
             break
 

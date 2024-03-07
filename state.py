@@ -1,18 +1,19 @@
-from board import Board, PlayerEnum, opponent_player
+from board import Board
 from move import Move, TypeOfMove
+from player import Player
 import numpy as np
 
 class State:
     def __init__(self, width: int = 9, height: int = 5):
         self.board = Board(width, height)
-        self.player = PlayerEnum.WHITE
+        self.player = Player.WHITE
         self.move_log = []
 
     def get_board_matrix(self):
         return self.board.board
     
     def change_player(self):
-        self.player = opponent_player(self.player)
+        self.player = Player.opponent_player(self.player)
 
     def in_move_log(self, move: Move):
         if self.move_log == []:
@@ -32,7 +33,7 @@ class State:
             print("Invalid move")
             return
         self.get_board_matrix()[move.row_destination][move.col_destination] = self.get_board_matrix()[move.row_origin][move.col_origin] 
-        self.get_board_matrix()[move.row_origin][move.col_origin] = PlayerEnum.EMPTY
+        self.get_board_matrix()[move.row_origin][move.col_origin] = Player.EMPTY
 
         direction = (move.row_destination - move.row_origin, move.col_destination - move.col_origin)
 
@@ -45,8 +46,8 @@ class State:
                 while True:
                     row_to_kill += direction[0]
                     col_to_kill += direction[1]
-                    if self.board.inside_board(row_to_kill, col_to_kill) and self.get_board_matrix()[row_to_kill][col_to_kill] == opponent_player(self.player):
-                        self.get_board_matrix()[row_to_kill][col_to_kill] = PlayerEnum.EMPTY
+                    if self.board.inside_board(row_to_kill, col_to_kill) and self.get_board_matrix()[row_to_kill][col_to_kill] == Player.opponent_player(self.player):
+                        self.get_board_matrix()[row_to_kill][col_to_kill] = Player.EMPTY
                     else:
                         break
             case TypeOfMove.WITHDRAWAL:
@@ -55,8 +56,8 @@ class State:
                     col_to_kill = move.col_origin
                     row_to_kill -= direction[0]
                     col_to_kill -= direction[1]
-                    if self.board.inside_board(row_to_kill, col_to_kill) and self.get_board_matrix()[row_to_kill][col_to_kill] == opponent_player(self.player):
-                        self.get_board_matrix()[row_to_kill][col_to_kill] = PlayerEnum.EMPTY
+                    if self.board.inside_board(row_to_kill, col_to_kill) and self.get_board_matrix()[row_to_kill][col_to_kill] == Player.opponent_player(self.player):
+                        self.get_board_matrix()[row_to_kill][col_to_kill] = Player.EMPTY
                     else:
                         break
 
@@ -67,11 +68,11 @@ class State:
             self.move_log.clear()
     
     def check_winner(self):
-        if np.count_nonzero(self.get_board_matrix() == PlayerEnum.BLACK) == 0:
-            return PlayerEnum.WHITE
-        if np.count_nonzero(self.get_board_matrix() == PlayerEnum.WHITE) == 0:
-            return PlayerEnum.BLACK
-        return PlayerEnum.EMPTY
+        if np.count_nonzero(self.get_board_matrix() == Player.BLACK) == 0:
+            return Player.WHITE
+        if np.count_nonzero(self.get_board_matrix() == Player.WHITE) == 0:
+            return Player.BLACK
+        return Player.EMPTY
 
     def draw(self):
         print("Next Player: ", self.player)

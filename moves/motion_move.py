@@ -1,5 +1,5 @@
 from moves.move import Move
-from board import PlayerEnum
+from player import Player
 
 class MotionMove(Move):
     def __init__(self, row_origin, col_origin, row_destination, col_destination):
@@ -26,7 +26,10 @@ class MotionMove(Move):
     def get_origin(self):
         return (self.row_origin, self.col_origin)
 
+    def execute_decorator(func):
+        return super().execute_decorator(func)
+
     def execute(self, state):
         state.get_board_matrix()[self.row_destination][self.col_destination] = state.get_board_matrix()[self.row_origin][self.col_origin]
-        state.get_board_matrix()[self.row_origin][self.col_origin] = PlayerEnum.EMPTY
+        state.get_board_matrix()[self.row_origin][self.col_origin] = Player.EMPTY
         return state

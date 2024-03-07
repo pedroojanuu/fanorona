@@ -10,7 +10,7 @@ class PassMove(Move):
     def __eq__(self, other: object):
         return isinstance(other, PassMove)
 
-    @super.execute_decorator
-    def execute(state):
+    @Move.execute_decorator
+    def execute(self, state):
         state.finish_turn()
         return state

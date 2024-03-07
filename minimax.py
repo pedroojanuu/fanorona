@@ -2,7 +2,7 @@ import random
 import math
 from heuristics.nr_pieces_heuristic import NrPiecesHeuristic
 from state import State
-from board import PlayerEnum
+from board import Player
 from game import Game
 
 def execute_random_move(game):
@@ -11,7 +11,7 @@ def execute_random_move(game):
 
 
 def minimax(state, depth, alpha, beta, maximizing, player, evaluate_func):
-    if depth == 0 or state.check_winner() != PlayerEnum.EMPTY:
+    if depth == 0 or state.check_winner() != Player.EMPTY:
         return evaluate_func(state, player)
         # evaluate_func gives the score from the perspective of player 1
         # if we are player 2, we need to invert the score

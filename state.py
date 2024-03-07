@@ -4,7 +4,8 @@ from board import Board
 from player import Player
 from moves.move import Move
 from moves.pass_move import PassMove
-from moves.approach_move import ApproachMove, test_approach_move
+from moves.approach_move import ApproachMove
+from moves.withdrawal_move import WithdrawalMove
 
 class State:
     def __init__(self, width: int = 9, height: int = 5):
@@ -12,6 +13,9 @@ class State:
         self.player = Player.WHITE
         self.move_log = []
 
+    def __str__(self):
+        return str(self.get_board_matrix()) + " " + str(self.player) + " " + str(self.move_log)
+        
     def get_board_matrix(self):
         return self.board.board
 
@@ -56,7 +60,7 @@ class State:
     #         print("Invalid move")
     #         return
     #     self.get_board_matrix()[move.row_destination][move.col_destination] = self.get_board_matrix()[move.row_origin][move.col_origin]
-    #     self.get_board_matrix()[move.row_origin][move.col_origin] = PlayerEnum.EMPTY
+    #     self.get_board_matrix()[move.row_origin][move.col_origin] = Player.EMPTY
     #     direction = (move.row_destination - move.row_origin, move.col_destination - move.col_origin)
 
     #     row_dest = move.row_destination
@@ -68,7 +72,7 @@ class State:
     #             while True:
     #                 row_to_kill += direction[0]
     #                 col_to_kill += direction[1]
-    #                 if self.board.inside_board(row_to_kill, col_to_kill) and self.get_board_matrix()[row_to_kill][col_to_kill] == opponent_player(self.player):
+    #                 if self.board.inside_board(row_to_kill, col_to_kill) and self.get_board_matrix()[row_to_kill][col_to_kill] == Player.opponent_player(self.player):
     #                     self.get_board_matrix()[row_to_kill][col_to_kill] = Player.EMPTY
     #                 else:
     #                     break
@@ -78,7 +82,7 @@ class State:
     #                 col_to_kill = move.col_origin
     #                 row_to_kill -= direction[0]
     #                 col_to_kill -= direction[1]
-    #                 if self.board.inside_board(row_to_kill, col_to_kill) and self.get_board_matrix()[row_to_kill][col_to_kill] == opponent_player(self.player):
+    #                 if self.board.inside_board(row_to_kill, col_to_kill) and self.get_board_matrix()[row_to_kill][col_to_kill] == Player.opponent_player(self.player):
     #                     self.get_board_matrix()[row_to_kill][col_to_kill] = Player.EMPTY
     #                 else:
     #                     break
@@ -108,17 +112,18 @@ class State:
 
 def test_approach_move():
     before = State()
+    before.get_board_matrix().fill(Player.EMPTY)
     before.get_board_matrix()[1][0] = Player.WHITE
     before.get_board_matrix()[2][0] = Player.BLACK
     before.player = Player.WHITE
 
-    move = ApproachMove(1, 0, 0, 0)
+    move = WithdrawalMove(1, 0, 0, 0)
     print(move)
 
     after = move.execute(before)
 
     print("State before:")
-    print(before)
+    print(before.get_board_matrix())
     print("State after")
     print(after)
 

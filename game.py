@@ -30,7 +30,7 @@ def play_simulation(initial_state: State):
 
     def run(self, ai_white, ai_black):
         while not self.state.game_over():
-            if self.state.white_turn():
+            if self.state.is_white_turn():
                 ai_white(self.state)
             else:
                 ai_black(self.state)

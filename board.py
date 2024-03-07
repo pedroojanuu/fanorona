@@ -1,10 +1,12 @@
 # import pygame
 import numpy as np
-import math
 from enum import Enum
-from move import Move, TypeOfMove
-from typing import List
 from adjacent_positions import ADJACENT_4, ADJACENT_ALL
+from moves.approach_move import ApproachMove
+from moves.withdrawal_move import WithdrawalMove
+from moves.free_move import FreeMove
+
+
 class PlayerEnum(Enum):
     EMPTY = 0
     BLACK = 1
@@ -74,7 +76,7 @@ class Board:
 
     def can_move_in_diagonal(self, r: int, c: int):
         return (r + c) % 2 == 0
-    def get_pieces(self, player: PlayerEnum):
+    def get_pieces(self, player: PlayerEnum) -> list[list[int, int]]:
         return np.argwhere(self.board == player)
 
     def get_adjacent_aproach(self, r: int, c: int):
@@ -115,17 +117,20 @@ class Board:
         for [r, c] in pieces:
             for r2, c2, r3, c3 in self.get_adjacent_aproach(r, c):
                 if self.board[r2][c2] == PlayerEnum.EMPTY and self.board[r3][c3] == opponent:
-                    moves.append(Move(r, c, r2, c2, TypeOfMove.APPROACH))
+                    moves.append(ApproachMove(r, c, r2, c2))
+                    # moves.append(Move(r, c, r2, c2, TypeOfMove.APPROACH))
 
             for r2, c2, r3, c3 in self.get_adjacent_withdrawal(r, c):
                 if self.board[r2][c2] == PlayerEnum.EMPTY and self.board[r3][c3] == opponent:
-                    moves.append(Move(r, c, r2, c2, TypeOfMove.WITHDRAWAL))
+                    moves.append(WithdrawalMove(r, c, r2, c2))
+                    # moves.append(Move(r, c, r2, c2, TypeOfMove.WITHDRAWAL))
 
         if moves == []:
             for [r, c] in pieces:
                 for r2, c2 in self.get_adjacent_free(r, c):
                     if self.board[r2][c2] == PlayerEnum.EMPTY:
-                        moves.append(Move(r, c, r2, c2, TypeOfMove.FREE))
+                        moves.append(FreeMove(r, c, r2, c2))
+                        # moves.append(Move(r, c, r2, c2, TypeOfMove.FREE))
 
         return moves
     
@@ -134,11 +139,13 @@ class Board:
         opponent = opponent_player(self.board[r][c])
         for r2, c2, r3, c3 in self.get_adjacent_aproach(r, c):
             if self.board[r2][c2] == PlayerEnum.EMPTY and self.board[r3][c3] == opponent:
-                moves.append(Move(r, c, r2, c2, TypeOfMove.APPROACH))
+                moves.append(ApproachMove(r, c, r2, c2))
+                # moves.append(Move(r, c, r2, c2, TypeOfMove.APPROACH))
 
         for r2, c2, r3, c3 in self.get_adjacent_withdrawal(r, c):
             if self.board[r2][c2] == PlayerEnum.EMPTY and self.board[r3][c3] == opponent:
-                moves.append(Move(r, c, r2, c2, TypeOfMove.WITHDRAWAL))
+                moves.append(WithdrawalMove(r, c, r2, c2))
+                # moves.append(Move(r, c, r2, c2, TypeOfMove.WITHDRAWAL))
 
         return moves
 

@@ -20,12 +20,13 @@ class WithdrawalMove(MotionMove):
     @Move.execute_decorator
     def execute(self, state):
         state = super().execute(state)
-        direction = (self.row_destination - self.row_origin, self.col_destination - self.col_origin)
+        rdir, cdir = (self.row_origin - self.row_destination, self.col_origin - self.col_destination)
+
+        row_to_kill = self.row_origin
+        col_to_kill = self.col_origin
         while True:
-            row_to_kill = self.row_origin
-            col_to_kill = self.col_origin
-            row_to_kill -= direction[0]
-            col_to_kill -= direction[1]
+            row_to_kill += rdir
+            col_to_kill += cdir
             if state.board.inside_board(row_to_kill, col_to_kill) and state.get_board_matrix()[row_to_kill][col_to_kill] == Player.opponent_player(state.player):
                 state.get_board_matrix()[row_to_kill][col_to_kill] = Player.EMPTY
             else:

@@ -1,6 +1,7 @@
 import sys
 import os
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 from state import State
 from player import Player
@@ -10,15 +11,18 @@ from moves.free_move import FreeMove
 from moves.approach_move import ApproachMove
 from moves.pass_move import PassMove
 
+
 def test(func):
     def wrapper(*args, **kwargs):
-        print("="*50)
+        print("=" * 50)
         print("Testing ", func.__name__)
         result = func(*args, **kwargs)
         print("Test finished")
-        print("="*50)
+        print("=" * 50)
         return result
+
     return wrapper
+
 
 @test
 def test_withdrawal_move():
@@ -35,9 +39,10 @@ def test_withdrawal_move():
 
     print("State before:")
     before.draw()
-    print("-"*50)
+    print("-" * 50)
     print("State after")
     after.draw()
+
 
 @test
 def test_free_move():
@@ -51,9 +56,10 @@ def test_free_move():
     after = before.execute_move(move)
     print("State before:")
     before.draw()
-    print("-"*50)
+    print("-" * 50)
     print("State after")
     after.draw()
+
 
 @test
 def test_approach_move():
@@ -70,9 +76,10 @@ def test_approach_move():
 
     print("State before:")
     before.draw()
-    print("-"*50)
+    print("-" * 50)
     print("State after")
     after.draw()
+
 
 @test
 def test_multiple_captures():
@@ -89,11 +96,12 @@ def test_multiple_captures():
     after = before.execute_move(move)
 
     before.draw()
-    print("-"*50)
+    print("-" * 50)
     after.draw()
     print("Next available moves:")
     print(after.get_available_moves())
     return after
+
 
 @test
 def test_pass(state):
@@ -101,8 +109,9 @@ def test_pass(state):
     print(move)
     after = state.execute_move(move)
     state.draw()
-    print("-"*50)
+    print("-" * 50)
     after.draw()
+
 
 @test
 def test_capture_more(state):
@@ -110,16 +119,44 @@ def test_capture_more(state):
     print(move)
     after = state.execute_move(move)
     state.draw()
-    print("-"*50)
+    print("-" * 50)
     after.draw()
     print("Next available moves:")
     print(after.get_available_moves())
 
-if __name__ == '__main__':
+@test
+def test_complex_board():
+    s = State()
+    rows, cols = s.get_board_matrix().shape
+    s.get_board_matrix()[0:2][0:cols] = Player.BLACK
+    s.get_board_matrix()[0][2] = Player.EMPTY
+    s.get_board_matrix()[1][3] = Player.EMPTY
+    r, c = center = 2, 4
+    s.get_board_matrix()[center] = Player.WHITE
+    s.get_board_matrix()[r + 1, c + 1] = Player.EMPTY
+    s.player = Player.BLACK
+    """
+    [
+        [B B   B B B B B B]
+        [B B B   B B B B B]
+        [B W B W W B W B W]
+        [W W W W W   W W W]
+        [W W W W W W W W W]]
+    """
+    move = WithdrawalMove(2, 2, 1, 3)
+    print(move)
+    after = s.execute_move(move)
+    s.draw()
+    print("-"*50)
+    after.draw()
+
+
+
+if __name__ == "__main__":
     test_withdrawal_move()
     test_free_move()
     test_approach_move()
     state = test_multiple_captures()
     test_pass(state)
     test_capture_more(state)
-
+    test_complex_board()

@@ -8,6 +8,19 @@ class Game:
     def __init__(self, width: int = 9, height: int = 5):
         self.state = State(width, height)
 
+    def run_ais(self, ai_white, ai_black, log_states = False):
+        while not self.state.game_over():
+            if log_states:
+                self.state.draw()
+            if self.state.is_white_turn():
+                ai_white(self)
+            else:
+                ai_black(self)
+
+        if log_states:
+            self.state.draw()
+        print("Winner: ", self.state.check_winner())
+
 def play_simulation(initial_state: State):
     initial_state.draw()
 
@@ -26,15 +39,6 @@ def play_simulation(initial_state: State):
         if initial_state.check_winner() != Player.EMPTY:
             print("Winner: ", initial_state.check_winner())
             break
-
-    def run(self, ai_white, ai_black):
-        while not self.state.game_over():
-            if self.state.is_white_turn():
-                ai_white(self.state)
-            else:
-                ai_black(self.state)
-
-        print("Winner: ", self.state.check_winner())
 
 
 if __name__ == '__main__':

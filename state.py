@@ -1,27 +1,29 @@
-from board import Board, PlayerEnum, opponent_player
-from moves.move import Move
 import numpy as np
+
+from board import Board
+from player import Player
+from moves.move import Move
 from moves.pass_move import PassMove
 from moves.approach_move import ApproachMove, test_approach_move
 
 class State:
-    def __init__(self):
-        self.board = Board()
-        self.player = PlayerEnum.WHITE
+    def __init__(self, width: int = 9, height: int = 5):
+        self.board = Board(width, height)
+        self.player = Player.WHITE
         self.move_log = []
 
     def get_board_matrix(self):
         return self.board.board
 
     def change_player(self):
-        self.player = opponent_player(self.player)
+        self.player = Player.opponent_player(self.player)
 
     def finish_turn(self):
         self.change_player()
         self.move_log.clear()
 
     def is_white_turn(self):
-        return self.player == PlayerEnum.WHITE
+        return self.player == Player.WHITE
 
     def in_move_log(self, move: Move):
         if self.move_log == []:
@@ -44,7 +46,7 @@ class State:
             print("Invalid move")
             return None
         nstate = move.execute(self)
-        # if do not have any possible next move, change player
+        # if no possible next move, change player
         if nstate.get_available_moves() == []:
             nstate.finish_turn()
         return nstate
@@ -53,10 +55,8 @@ class State:
     #     if move not in self.board.get_all_moves(self.player) and not self.in_move_log(move):
     #         print("Invalid move")
     #         return
-
     #     self.get_board_matrix()[move.row_destination][move.col_destination] = self.get_board_matrix()[move.row_origin][move.col_origin]
     #     self.get_board_matrix()[move.row_origin][move.col_origin] = PlayerEnum.EMPTY
-
     #     direction = (move.row_destination - move.row_origin, move.col_destination - move.col_origin)
 
     #     row_dest = move.row_destination
@@ -69,7 +69,7 @@ class State:
     #                 row_to_kill += direction[0]
     #                 col_to_kill += direction[1]
     #                 if self.board.inside_board(row_to_kill, col_to_kill) and self.get_board_matrix()[row_to_kill][col_to_kill] == opponent_player(self.player):
-    #                     self.get_board_matrix()[row_to_kill][col_to_kill] = PlayerEnum.EMPTY
+    #                     self.get_board_matrix()[row_to_kill][col_to_kill] = Player.EMPTY
     #                 else:
     #                     break
     #         case TypeOfMove.WITHDRAWAL:
@@ -79,7 +79,7 @@ class State:
     #                 row_to_kill -= direction[0]
     #                 col_to_kill -= direction[1]
     #                 if self.board.inside_board(row_to_kill, col_to_kill) and self.get_board_matrix()[row_to_kill][col_to_kill] == opponent_player(self.player):
-    #                     self.get_board_matrix()[row_to_kill][col_to_kill] = PlayerEnum.EMPTY
+    #                     self.get_board_matrix()[row_to_kill][col_to_kill] = Player.EMPTY
     #                 else:
     #                     break
 
@@ -90,14 +90,14 @@ class State:
     #         self.move_log.clear()
     
     def check_winner(self):
-        if np.count_nonzero(self.get_board_matrix() == PlayerEnum.BLACK) == 0:
-            return PlayerEnum.WHITE
-        if np.count_nonzero(self.get_board_matrix() == PlayerEnum.WHITE) == 0:
-            return PlayerEnum.BLACK
-        return PlayerEnum.EMPTY
+        if np.count_nonzero(self.get_board_matrix() == Player.BLACK) == 0:
+            return Player.WHITE
+        if np.count_nonzero(self.get_board_matrix() == Player.WHITE) == 0:
+            return Player.BLACK
+        return Player.EMPTY
 
     def game_over(self):
-        return self.check_winner() != PlayerEnum.EMPTY
+        return self.check_winner() != Player.EMPTY
 
     def draw(self):
         print("Next Player: ", self.player)
@@ -106,21 +106,21 @@ class State:
 
 
 
-# def test_approach_move():
-#     before = State()
-#     before.get_board_matrix()[1][0] = PlayerEnum.WHITE
-#     before.get_board_matrix()[2][0] = PlayerEnum.BLACK
-#     before.player = PlayerEnum.WHITE
+def test_approach_move():
+    before = State()
+    before.get_board_matrix()[1][0] = Player.WHITE
+    before.get_board_matrix()[2][0] = Player.BLACK
+    before.player = Player.WHITE
 
-#     move = ApproachMove(1, 0, 0, 0)
-#     print(move)
+    move = ApproachMove(1, 0, 0, 0)
+    print(move)
 
-#     after = move.execute(before)
+    after = move.execute(before)
 
-#     print("State before:")
-#     print(before)
-#     print("State after")
-#     print(after)
+    print("State before:")
+    print(before)
+    print("State after")
+    print(after)
 
 
 if __name__ == '__main__':

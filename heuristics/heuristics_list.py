@@ -4,8 +4,9 @@ if __name__ == "__main__":
     sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from heuristics.heuristic import Heuristic
-from state import State, PlayerEnum
-from board import Board, opponent_player
+from state import State, Player
+from board import Board
+from player import Player
 import numpy as np
 from enum import Enum
 
@@ -41,14 +42,14 @@ def test_heuristic_list():
         weights=np.array([100000, 50, 25, 10, 5]),
     )
 
-    s.get_board_matrix().fill(PlayerEnum.EMPTY)  # clear the board
+    s.get_board_matrix().fill(Player.EMPTY)  # clear the board
 
-    s.get_board_matrix()[0,0:5] = PlayerEnum.WHITE
-    s.get_board_matrix()[1,0:4] = PlayerEnum.BLACK
+    s.get_board_matrix()[0,0:5] = Player.WHITE
+    s.get_board_matrix()[1,0:4] = Player.BLACK
 
     print(s.get_board_matrix())
-    white_eval = h.evaluate_board(s, PlayerEnum.WHITE)
-    black_eval = h.evaluate_board(s, PlayerEnum.BLACK)
+    white_eval = h.evaluate_board(s, Player.WHITE)
+    black_eval = h.evaluate_board(s, Player.BLACK)
     print(white_eval, black_eval)
     assert white_eval > 0, f"Expected white advantage, but got {white_eval}"
     assert black_eval < 0, f"Expected black disadvantage, but got {black_eval}"

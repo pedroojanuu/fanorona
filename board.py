@@ -1,82 +1,56 @@
 # import pygame
 import numpy as np
-from enum import Enum
+
 from adjacent_positions import ADJACENT_4, ADJACENT_ALL
+from player import Player
 from moves.approach_move import ApproachMove
 from moves.withdrawal_move import WithdrawalMove
 from moves.free_move import FreeMove
 
 
-class PlayerEnum(Enum):
-    EMPTY = 0
-    BLACK = 1
-    WHITE = 2
-
-    def __str__(self):
-        match self:
-            case PlayerEnum.EMPTY:
-                return "EMPTY"
-            case PlayerEnum.BLACK:
-                return '\033[94m' + "BLACK" + '\033[0m'
-            case PlayerEnum.WHITE:
-                return '\033[93m' + "WHITE" + '\033[0m'
-    
-    def __repr__(self):
-        match self:
-            case PlayerEnum.EMPTY:
-                return " "
-            case PlayerEnum.BLACK:
-                return "B"
-            case PlayerEnum.WHITE:
-                return "W"
-
-def opponent_player(player):
-    if player == PlayerEnum.BLACK:
-        return PlayerEnum.WHITE
-    return PlayerEnum.BLACK
-
 class Board:
     def __init__(self, width: int = 9, height: int = 5):
         self.width = width
         self.height = height
-        self.board = np.zeros((self.height, self.width), dtype=PlayerEnum)
-        self.board.fill(PlayerEnum.EMPTY)
+        self.board = np.zeros((self.height, self.width), dtype=Player)
+        self.board.fill(Player.EMPTY)
 
         halfHeight = (self.height - 1) // 2
         halfWidth = (self.width - 1) // 2
         for row in range(halfHeight):
             for col in range(self.width):
-                self.board[row][col] = PlayerEnum.BLACK
-                self.board[self.height - 1 - row][col] = PlayerEnum.WHITE
+                self.board[row][col] = Player.BLACK
+                self.board[self.height - 1 - row][col] = Player.WHITE
 
         if self.height % 2 == 0:
             for col in range(0, halfWidth, 2):
-                self.board[halfHeight][col] = PlayerEnum.BLACK
-                self.board[halfHeight + 1][col] = PlayerEnum.BLACK
+                self.board[halfHeight][col] = Player.BLACK
+                self.board[halfHeight + 1][col] = Player.BLACK
 
-                self.board[halfHeight][width - col - 1] = PlayerEnum.WHITE
-                self.board[halfHeight + 1][width - col - 1] = PlayerEnum.WHITE
+                self.board[halfHeight][width - col - 1] = Player.WHITE
+                self.board[halfHeight + 1][width - col - 1] = Player.WHITE
 
             for col in range(1, halfWidth, 2):
-                self.board[halfHeight][col] = PlayerEnum.WHITE
-                self.board[halfHeight + 1][col] = PlayerEnum.WHITE
+                self.board[halfHeight][col] = Player.WHITE
+                self.board[halfHeight + 1][col] = Player.WHITE
 
-                self.board[halfHeight][width - col - 1] = PlayerEnum.BLACK
-                self.board[halfHeight + 1][width - col - 1] = PlayerEnum.BLACK
+                self.board[halfHeight][width - col - 1] = Player.BLACK
+                self.board[halfHeight + 1][width - col - 1] = Player.BLACK
         else:
             for col in range(0, halfWidth, 2):
-                self.board[halfHeight][col] = PlayerEnum.BLACK
-                self.board[halfHeight][width - col - 1] = PlayerEnum.WHITE
+                self.board[halfHeight][col] = Player.BLACK
+                self.board[halfHeight][width - col - 1] = Player.WHITE
             for col in range(1, halfWidth, 2):
-                self.board[halfHeight][col] = PlayerEnum.WHITE
-                self.board[halfHeight][width - col - 1] = PlayerEnum.BLACK
+                self.board[halfHeight][col] = Player.WHITE
+                self.board[halfHeight][width - col - 1] = Player.BLACK
 
     def inside_board(self, r: int, c: int):
         return r >= 0 and r < self.height and c >= 0 and c < self.width
 
     def can_move_in_diagonal(self, r: int, c: int):
         return (r + c) % 2 == 0
-    def get_pieces(self, player: PlayerEnum) -> list[list[int, int]]:
+
+    def get_pieces(self, player: Player) -> list[list[int, int]]:
         return np.argwhere(self.board == player)
 
     def get_adjacent_aproach(self, r: int, c: int):
@@ -110,25 +84,25 @@ class Board:
             if self.inside_board(r2, c2):
                 yield (r2, c2)
 
-    def get_all_moves(self, player: PlayerEnum):
+    def get_all_moves(self, player: Player):
         moves = []
         pieces = self.get_pieces(player)
-        opponent = opponent_player(player)
+        opponent = Player.opponent_player(player)
         for [r, c] in pieces:
             for r2, c2, r3, c3 in self.get_adjacent_aproach(r, c):
-                if self.board[r2][c2] == PlayerEnum.EMPTY and self.board[r3][c3] == opponent:
+                if self.board[r2][c2] == Player.EMPTY and self.board[r3][c3] == opponent:
                     moves.append(ApproachMove(r, c, r2, c2))
                     # moves.append(Move(r, c, r2, c2, TypeOfMove.APPROACH))
 
             for r2, c2, r3, c3 in self.get_adjacent_withdrawal(r, c):
-                if self.board[r2][c2] == PlayerEnum.EMPTY and self.board[r3][c3] == opponent:
+                if self.board[r2][c2] == Player.EMPTY and self.board[r3][c3] == opponent:
                     moves.append(WithdrawalMove(r, c, r2, c2))
                     # moves.append(Move(r, c, r2, c2, TypeOfMove.WITHDRAWAL))
 
         if moves == []:
             for [r, c] in pieces:
                 for r2, c2 in self.get_adjacent_free(r, c):
-                    if self.board[r2][c2] == PlayerEnum.EMPTY:
+                    if self.board[r2][c2] == Player.EMPTY:
                         moves.append(FreeMove(r, c, r2, c2))
                         # moves.append(Move(r, c, r2, c2, TypeOfMove.FREE))
 
@@ -136,20 +110,20 @@ class Board:
     
     def get_tile_moves(self, r: int, c: int):
         moves = []
-        opponent = opponent_player(self.board[r][c])
+        opponent = Player.opponent_player(self.board[r][c])
         for r2, c2, r3, c3 in self.get_adjacent_aproach(r, c):
-            if self.board[r2][c2] == PlayerEnum.EMPTY and self.board[r3][c3] == opponent:
+            if self.board[r2][c2] == Player.EMPTY and self.board[r3][c3] == opponent:
                 moves.append(ApproachMove(r, c, r2, c2))
                 # moves.append(Move(r, c, r2, c2, TypeOfMove.APPROACH))
 
         for r2, c2, r3, c3 in self.get_adjacent_withdrawal(r, c):
-            if self.board[r2][c2] == PlayerEnum.EMPTY and self.board[r3][c3] == opponent:
+            if self.board[r2][c2] == Player.EMPTY and self.board[r3][c3] == opponent:
                 moves.append(WithdrawalMove(r, c, r2, c2))
                 # moves.append(Move(r, c, r2, c2, TypeOfMove.WITHDRAWAL))
 
         return moves
 
-    def set_place(self, r: int, c: int, player: PlayerEnum):
+    def set_place(self, r: int, c: int, player: Player):
         self.board[r][c] = player
 
     def get_place(self, r: int, c: int):
@@ -161,5 +135,5 @@ class Board:
 if __name__ == '__main__':
     # b = Board()
     c = Board(9, 6)
-    print(c.get_all_moves(PlayerEnum.WHITE))
+    print(c.get_all_moves(Player.WHITE))
 

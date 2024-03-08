@@ -18,14 +18,21 @@ class State:
     def in_move_log(self, move: Move):
         if self.move_log == []:
             return False
-        return move.get_destination() == self.move_log[0].get_origin() or all(map(lambda x: x.get_destination() == move.get_destination(), self.move_log))
+        return move.get_destination() == self.move_log[0].get_origin() or any(map(lambda x: x.get_destination() == move.get_destination(), self.move_log))
+
+    def have_the_same_direction(self, move1: Move, move2: Move):
+        delta_row_move_1 = move1.row_destination - move1.row_origin
+        delta_col_move_1 = move1.col_destination - move1.col_origin
+        delta_row_move_2 = move2.row_destination - move2.row_origin
+        delta_col_move_2 = move2.col_destination - move2.col_origin
+        return delta_row_move_1 == delta_row_move_2 and delta_col_move_1 == delta_col_move_2
 
     def get_available_moves(self):
         if self.move_log == []:
             return self.board.get_all_moves(self.player)
         else:
             all_tile_moves = self.board.get_tile_moves(self.move_log[-1].row_destination, self.move_log[-1].col_destination)
-            return list(filter(lambda x: not self.in_move_log(x), all_tile_moves))
+            return list(filter(lambda x: not self.in_move_log(x) and not self.have_the_same_direction(x, self.move_log[-1]), all_tile_moves))
             
     
     def execute_move(self, move: Move):

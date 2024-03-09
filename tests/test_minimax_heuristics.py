@@ -45,7 +45,7 @@ def test_random_vs_random(nr: int):
 
 
 @test
-def test_pieces_vs_random(nr: int):
+def test_random_vs_pieces(nr: int):
     test_heuristic(
         execute_random_move,
         execute_minimax_move(NrPiecesHeuristic().evaluate_board, 2),
@@ -80,7 +80,7 @@ def test_win_pieces_vs_random(nr: int):
 def test_win_adjacent_vs_random(nr: int):
     test_heuristic(
         execute_minimax_move(
-            HeuristicsList(
+            HeuristicsList(  # an heuristic like this is not very good (it is not considering the number of pieces)
                 [WinHeuristic(), AdjacentPiecesHeuristic()], [10000, 1]
             ).evaluate_board,
             2,
@@ -182,13 +182,15 @@ def test_different_weights_pieces_adjacent_groups(nr: int):
 
 
 if __name__ == "__main__":
-    test_random_vs_random(10)
+    nr = 100  # The same for all to allow easy time comparison
+    test_random_vs_random(nr)
 
-    test_pieces_vs_random(100)
-    test_win_vs_random(100)
-    test_win_pieces_vs_random(100)
-    test_win_adjacent_vs_random(100)
-    test_win_groups_vs_random(100)
-    test_win_center_vs_random(100)
-    test_pieces_adjacent_groups_vs_random(100)
-    test_different_weights_pieces_adjacent_groups(100)
+    test_random_vs_pieces(nr)
+    test_win_vs_random(nr)
+    test_win_pieces_vs_random(nr)
+    test_win_adjacent_vs_random(nr)
+    test_win_groups_vs_random(nr)
+    test_win_center_vs_random(nr)
+    test_pieces_adjacent_groups_vs_random(nr)
+
+    test_different_weights_pieces_adjacent_groups(nr)

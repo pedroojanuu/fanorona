@@ -2,6 +2,7 @@ from import_from_parent import import_from_parent
 import_from_parent()
 
 from board import PlayerEnum
+from copy import deepcopy
 import random
 import math
 
@@ -41,15 +42,12 @@ class MonteCarloNode:
         return random.choice(all_max(self.children, key=lambda x: x[0].ucb1()))
     
     def expand(self, state):
+        state = deepcopy(state)
         moves = state.get_available_moves()
 
         for move in moves:
             self.add_child(MonteCarloNode(self), move)
-        try:
-            return random.choice(self.children)[0]
-        except:
-            state.draw().check_winner()
-            print(self.children, moves)
+        return random.choice(self.children)[0]
     
     def rollout(self, state):
         while state.check_winner() == PlayerEnum.EMPTY:

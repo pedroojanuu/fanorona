@@ -68,9 +68,9 @@ class State:
     
     def check_winner(self):
         if np.count_nonzero(self.get_board_matrix() == PlayerEnum.WHITE) == 0:
-            return PlayerEnum.WHITE
-        if np.count_nonzero(self.get_board_matrix() == PlayerEnum.BLACK) == 0:
             return PlayerEnum.BLACK
+        if np.count_nonzero(self.get_board_matrix() == PlayerEnum.BLACK) == 0:
+            return PlayerEnum.WHITE
         return PlayerEnum.EMPTY
     
     def draw(self):

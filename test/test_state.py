@@ -15,9 +15,9 @@ from moves.pass_move import PassMove
 def test(func):
     def wrapper(*args, **kwargs):
         print("=" * 50)
-        print("Testing ", func.__name__)
+        print("Testing", func.__name__)
         result = func(*args, **kwargs)
-        print("Test finished")
+        print("Test finished", func.__name__)
         print("=" * 50)
         return result
 
@@ -124,6 +124,7 @@ def test_capture_more(state):
     print("Next available moves:")
     print(after.get_available_moves())
 
+
 @test
 def test_complex_board():
     s = State()
@@ -147,9 +148,25 @@ def test_complex_board():
     print(move)
     after = s.execute_move(move)
     s.draw()
-    print("-"*50)
+    print("-" * 50)
     after.draw()
 
+
+@test
+def test_same_direction_capture():
+    before = State()
+    before.get_board_matrix().fill(Player.EMPTY)
+    before.get_board_matrix()[0][2] = Player.WHITE
+    before.get_board_matrix()[0][[0, 1, 5, 6, 7]] = Player.BLACK
+    move = WithdrawalMove(0, 2, 0, 3)
+    print(move)
+    after = before.execute_move(move)
+
+    before.draw()
+    print("-" * 50)
+    after.draw()    # This should not be for the same player
+    print("Next available moves:")  # There should not be a PassMove
+    print(after.get_available_moves())
 
 
 if __name__ == "__main__":
@@ -160,3 +177,4 @@ if __name__ == "__main__":
     test_pass(state)
     test_capture_more(state)
     test_complex_board()
+    test_same_direction_capture()

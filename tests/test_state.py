@@ -11,18 +11,7 @@ from moves.free_move import FreeMove
 from moves.approach_move import ApproachMove
 from moves.pass_move import PassMove
 
-
-def test(func):
-    def wrapper(*args, **kwargs):
-        print("=" * 50)
-        print("Testing", func.__name__)
-        result = func(*args, **kwargs)
-        print("Test finished", func.__name__)
-        print("=" * 50)
-        return result
-
-    return wrapper
-
+from tests.test import test
 
 @test
 def test_withdrawal_move():

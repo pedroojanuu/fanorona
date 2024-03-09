@@ -1,13 +1,22 @@
 import random
 import math
 from heuristics.nr_pieces_heuristic import NrPiecesHeuristic
-from state import State
+from heuristics.adjacent_pieces_heuristic import AdjacentPiecesHeuristic
+from heuristics.heuristics_list import HeuristicsList
+from heuristics.win_heuristic import WinHeuristic
+from heuristics.groups_heuristic import GroupsHeuristic
+from heuristics.center_control_heuristic import CenterControlHeuristic
 from player import Player
 from game import Game
 
+
 def execute_random_move(game: Game):
-    move = random.choice(game.state.get_available_moves())
+    moves = game.state.get_available_moves()
+    if moves == []:  # No moves available (forfeit the game)
+        return True
+    move = random.choice(moves)
     game.state = game.state.execute_move(move)
+    return False
 
 
 def minimax(state, depth, alpha, beta, player_to_win, evaluate_func):
@@ -41,27 +50,24 @@ def minimax(state, depth, alpha, beta, player_to_win, evaluate_func):
         return min_eval
 
 
-def execute_minimax_move(evaluate_func, depth):
-    def execute_minimax_move_aux(game):
+def execute_minimax_move(evaluate_func, depth: int):
+    def execute_minimax_move_aux(game: Game):
         best_state = None
 
         alpha = best_eval = -math.inf
         beta = math.inf
         for mv in game.state.get_available_moves():
             nstate = game.state.execute_move(mv)
-            nstate_eval = minimax(nstate, depth - 1, alpha, beta, game.state.player, evaluate_func)
+            nstate_eval = minimax(
+                nstate, depth - 1, alpha, beta, game.state.player, evaluate_func
+            )
 
             if nstate_eval > best_eval:
                 alpha = best_eval = nstate_eval
                 best_state = nstate
 
         game.state = best_state
+        return False
 
     return execute_minimax_move_aux
 
-
-if __name__ == "__main__":
-    for _ in range(1):
-        game = Game()
-        game.run_ais(execute_random_move, execute_random_move, log_states=True)
-    # execute_minimax_move(NrPiecesHeuristic().evaluate_board, 2)

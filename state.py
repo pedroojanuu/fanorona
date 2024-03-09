@@ -61,49 +61,13 @@ class State:
             nstate.finish_turn()
         return nstate
 
-    # def execute_move(self, move: Move):
-    #     if move not in self.board.get_all_moves(self.player) and not self.in_move_log(move):
-    #         print("Invalid move")
-    #         return
-    #     self.get_board_matrix()[move.row_destination][move.col_destination] = self.get_board_matrix()[move.row_origin][move.col_origin]
-    #     self.get_board_matrix()[move.row_origin][move.col_origin] = Player.EMPTY
-    #     direction = (move.row_destination - move.row_origin, move.col_destination - move.col_origin)
-
-    #     row_dest = move.row_destination
-    #     col_dest = move.col_destination
-    #     match (move.type):
-    #         case TypeOfMove.APPROACH:
-    #             row_to_kill = move.row_destination
-    #             col_to_kill = move.col_destination
-    #             while True:
-    #                 row_to_kill += direction[0]
-    #                 col_to_kill += direction[1]
-    #                 if self.board.inside_board(row_to_kill, col_to_kill) and self.get_board_matrix()[row_to_kill][col_to_kill] == Player.opponent_player(self.player):
-    #                     self.get_board_matrix()[row_to_kill][col_to_kill] = Player.EMPTY
-    #                 else:
-    #                     break
-    #         case TypeOfMove.WITHDRAWAL:
-    #             while True:
-    #                 row_to_kill = move.row_origin
-    #                 col_to_kill = move.col_origin
-    #                 row_to_kill -= direction[0]
-    #                 col_to_kill -= direction[1]
-    #                 if self.board.inside_board(row_to_kill, col_to_kill) and self.get_board_matrix()[row_to_kill][col_to_kill] == Player.opponent_player(self.player):
-    #                     self.get_board_matrix()[row_to_kill][col_to_kill] = Player.EMPTY
-    #                 else:
-    #                     break
-
-    #     self.move_log.append(move)
-
-    #     if self.get_available_moves() == []:
-    #         self.change_player()
-    #         self.move_log.clear()
-    
     def check_winner(self):
         if np.count_nonzero(self.get_board_matrix() == Player.BLACK) == 0:
             return Player.WHITE
         if np.count_nonzero(self.get_board_matrix() == Player.WHITE) == 0:
             return Player.BLACK
+        if self.get_available_moves() == []:    # if no moves, forfeit game
+            return Player.opponent_player(self.player)
         return Player.EMPTY
 
     def game_over(self):

@@ -5,11 +5,11 @@ if __name__ == "__main__":
 
 from heuristics.heuristic import Heuristic
 from state import State
-from board import Player
+from player import Player
 import numpy as np
 
 class WinHeuristic(Heuristic):
-    def evaluate_board(self, state, player_to_win):
+    def evaluate_board(self, state: State, player_to_win: Player):
         if state.check_winner() != Player.EMPTY:
             return 1 if state.check_winner() == player_to_win else -1
         return 0

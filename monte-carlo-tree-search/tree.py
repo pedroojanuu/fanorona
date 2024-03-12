@@ -128,9 +128,9 @@ def play_simulation(state: State, mcts: MonteCarloTree):
 
 if __name__ == '__main__':
     mcts = MonteCarloTree()
-    mcts.train(10000)
+    mcts.train(100000)
     # mcts.print_tree()
-    # mcts.save_to_disk("test.mcts")
+    mcts.save_to_disk("test.mcts")
     # mcts = MonteCarloTree.load_from_disk("test.mcts")
     play_simulation(State(), mcts)
     # mcts.state.draw()

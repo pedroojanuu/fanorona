@@ -31,15 +31,18 @@ class MonteCarloNode:
         self.children.append((child, move))
 
     # Upper Confidence Bound 1
-    def ucb1(self):
+    def ucb1(self, c=2):
         if self.visits == 0:
             return float("inf")
-        return self.total / self.visits + 2 * (math.log(self.visits) / self.parentNode.visits) ** 0.5
+        return self.total / self.visits + c * (math.log(self.visits) / self.parentNode.visits) ** 0.5
 
     def select_child(self):
         if self.children == []:
             return None
-        return random.choice(all_max(self.children, key=lambda x: x[0].ucb1()))
+        if PlayerEnum.WHITE == self.player:
+            return random.choice(all_max(self.children, key=lambda x: x[0].ucb1(2)))
+        else:
+            return random.choice(all_max(self.children, key=lambda x: x[0].ucb1(10)))
     
     def expand(self, state):
         state = deepcopy(state)
@@ -56,7 +59,7 @@ class MonteCarloNode:
     
     def backpropagate(self, winner):
         self.visits += 1
-        if winner == self.player:
+        if winner == PlayerEnum.WHITE and self.player == PlayerEnum.WHITE:
             self.total += 1
         if self.parentNode is not None:
             self.parentNode.backpropagate(winner)

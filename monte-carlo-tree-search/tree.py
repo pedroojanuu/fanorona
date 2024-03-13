@@ -101,7 +101,7 @@ class MonteCarloTree:
 def play_simulation(state: State, mcts: MonteCarloTree):
     state.draw()
 
-    for i in range(50):
+    for i in range(10):
         # print("Available moves: ", state.board.get_available_moves(state.player))
         if state.player == PlayerEnum.WHITE:
             move_to_exe = mcts.get_best_move()
@@ -127,10 +127,10 @@ def play_simulation(state: State, mcts: MonteCarloTree):
             break
 
 if __name__ == '__main__':
-    mcts = MonteCarloTree()
-    mcts.train(100000)
+    mcts = MonteCarloTree.load_from_disk("test.mcts")
+    #mcts.train(100000)
     # mcts.print_tree()
-    mcts.save_to_disk("test.mcts")
+    #mcts.save_to_disk("test.mcts")
     # mcts = MonteCarloTree.load_from_disk("test.mcts")
     play_simulation(State(), mcts)
     # mcts.state.draw()

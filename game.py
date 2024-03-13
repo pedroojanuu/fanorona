@@ -1,6 +1,6 @@
 from time import sleep
 import pygame
-from board import Board
+from state import State
 from player import Player
 
 class Game:
@@ -18,12 +18,17 @@ class Game:
         # TODO: Mode selection
 
         # TODO: Board size selection
-        # for i in range(5, 10):
-        #     pygame.draw.rect(self.canvas, (255,255,255), (70*i, 350, 70, 50))
-        #     font = pygame.font.Font('Montserrat-Black.otf', 36)
-        #     text = font.render(str(i), True, (0,0,0))
-        #     self.canvas.blit(text, (70*i+10, 360))
-        # pygame.display.update()
+        for i in range(5, 11):
+            for j in range(5, 11):
+                text = self.font.render(f"{i}*{j}", True, (0,0,0), (255,255,255))
+                textRect = text.get_rect()
+                textRect.center = ((i-4)*50, (j-4)*60)
+                self.canvas.blit(text, textRect)
+        
+        pygame.display.update()
+
+        sleep(2)
+        exit()
 
         # while True:
         #     for event in pygame.event.get():
@@ -40,13 +45,10 @@ class Game:
 
         self.canvas = pygame.display.set_mode((self.width*70, self.height*70 + 15))
 
-        self.board = Board(width=self.width, height=self.height)
+        self.state = State(self.width, self.height)
         self.player = Player.WHITE
 
         self.exit = False
-    
-    def change_player(self):
-        self.player = Player.opponent_player(self.player)
     
     def draw(self):
         self.canvas.fill((184, 59, 50)) # Background
@@ -65,9 +67,9 @@ class Game:
 
         for row in range(self.height):
             for col in range(self.width):
-                if self.board.board[row][col] == Player.WHITE:
+                if self.state.board.board[row][col] == Player.WHITE:
                     pygame.draw.circle(self.canvas, (255,255,255), (70*col+35, 70*row+35), 30)
-                elif self.board.board[row][col] == Player.BLACK:
+                elif self.state.board.board[row][col] == Player.BLACK:
                     pygame.draw.circle(self.canvas, (0,0,0), (70*col+35, 70*row+35), 30)
         
         if self.selected_tile != None:
@@ -95,7 +97,7 @@ class Game:
                     x, y = pygame.mouse.get_pos()
                     col = x // 70
                     row = y // 70
-                    if self.board.board[row][col] == self.player:
+                    if self.state.board.board[row][col] == self.player:
                         self.selected_tile = (row, col)
                     else:
                         self.selected_tile = None

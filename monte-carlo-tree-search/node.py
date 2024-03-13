@@ -20,12 +20,13 @@ def all_max(iterable, key):
 
 
 class MonteCarloNode:
-    def __init__(self, parentNode):
+    def __init__(self, parentNode, state):
         self.total = 0
         self.visits = 0
         self.parentNode = parentNode
         self.player = PlayerEnum.WHITE
         self.children = []
+        self.state = state
 
     def add_child(self, child, move):
         self.children.append((child, move))
@@ -44,7 +45,7 @@ class MonteCarloNode:
         else:
             return random.choice(all_max(self.children, key=lambda x: x[0].ucb1(10)))
     
-    def expand(self, state):
+    def expand(self):
         state = deepcopy(state)
         moves = state.get_available_moves()
 

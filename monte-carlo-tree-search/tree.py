@@ -9,9 +9,11 @@ import pickle
 import random
 
 class MonteCarloTree:
-    def __init__(self):
+    def __init__(self, boardWidth, boardHeight, cWhite=2, cBlack=10):
         self.root = MonteCarloNode(None)
-        self.state = State()
+        self.boardWidth = boardWidth
+        self.boardHeight = boardHeight
+        self.state = State(boardWidth, boardHeight)
         self.currNode = self.root
     
     def save_to_disk(self, path):
@@ -57,7 +59,7 @@ class MonteCarloTree:
     def train(self, iterations):
         for _ in range(iterations):
             self.one_training_iteration()
-            self.state = State()
+            self.state = State(self.boardWidth, self.boardHeight)
         
     def get_best_move(self):
         if self.currNode == None or self.currNode.children == []:
@@ -94,7 +96,7 @@ class MonteCarloTree:
         raise Exception("Move not found: ", move_to_exe, " in children: ", self.currNode.children)
     
     def reset_game(self):
-        self.state = State()
+        self.state = State(self.boardWidth, self.boardHeight)
         self.currNode = self.root
     
 

@@ -29,6 +29,11 @@ class Game:
         #         if event.type == pygame.MOUSEBUTTONDOWN:
         #             x, y = pygame.mouse.get_pos()
         #             print(x, y)
+        
+        # TEMP
+        self.width = 5
+        self.height = 5
+        # TEMP
 
         self.canvas = pygame.display.set_mode((self.width*70, self.height*70 + 15))
 

@@ -1,16 +1,19 @@
 from time import sleep
 import pygame
-from board import Board, PlayerEnum, opponent_player
+from board import Board
+from player import Player
 
 class Game:
     def __init__(self):
         pygame.init()
-        self.canvas = pygame.display.set_mode((350, 400))
+        self.canvas = pygame.display.set_mode((350, 420))
         self.canvas.fill((184, 59, 50)) # Background
+        self.font = pygame.font.Font('freesansbold.ttf', 15)
         pygame.display.set_caption("Fanorona")
         pygame.display.update()
 
         self.selected_tile = None
+        self.game_over = False
         
         # TODO: Mode selection
 
@@ -31,19 +34,19 @@ class Game:
         #             print(x, y)
         
         # TEMP
-        self.width = 5
-        self.height = 5
+        self.width = 7
+        self.height = 10
         # TEMP
 
         self.canvas = pygame.display.set_mode((self.width*70, self.height*70 + 15))
 
         self.board = Board(width=self.width, height=self.height)
-        self.player = PlayerEnum.BLACK
+        self.player = Player.WHITE
 
         self.exit = False
     
     def change_player(self):
-        self.player = opponent_player(self.player)
+        self.player = Player.opponent_player(self.player)
     
     def draw(self):
         self.canvas.fill((184, 59, 50)) # Background
@@ -62,20 +65,28 @@ class Game:
 
         for row in range(self.height):
             for col in range(self.width):
-                if self.board.board[row][col] == PlayerEnum.WHITE:
+                if self.board.board[row][col] == Player.WHITE:
                     pygame.draw.circle(self.canvas, (255,255,255), (70*col+35, 70*row+35), 30)
-                elif self.board.board[row][col] == PlayerEnum.BLACK:
+                elif self.board.board[row][col] == Player.BLACK:
                     pygame.draw.circle(self.canvas, (0,0,0), (70*col+35, 70*row+35), 30)
         
         if self.selected_tile != None:
             pygame.draw.circle(self.canvas, (235,235,52), (70*self.selected_tile[1]+35, 70*self.selected_tile[0]+35), 30, 3)
         
-        # TODO: Write player turn in bottom
+        if self.player == Player.BLACK:
+            text = self.font.render("Black's turn", True, (0,0,0), (184,59,50))
+        elif self.player == Player.WHITE:
+            text = self.font.render("White's turn", True, (255,255,255), (184,59,50))
+        textRect = text.get_rect()
+        textRect.center = (50, self.height*70+7)
+        self.canvas.blit(text, textRect)
 
         pygame.display.update()
 
     def play(self):
         while not self.exit:
+            # TODO: Check winner
+
             # TODO: Move selection/execution/board update
             for event in pygame.event.get():
                 if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
@@ -84,10 +95,10 @@ class Game:
                     x, y = pygame.mouse.get_pos()
                     col = x // 70
                     row = y // 70
-                    if self.board.board[row][col] != PlayerEnum.EMPTY:
+                    if self.board.board[row][col] == self.player:
                         self.selected_tile = (row, col)
-
-            # TODO: Check winner
+                    else:
+                        self.selected_tile = None
 
             self.draw()
 

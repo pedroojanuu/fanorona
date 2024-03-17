@@ -9,11 +9,11 @@ import pickle
 import random
 
 class MonteCarloTree:
-    def __init__(self, boardWidth, boardHeight, cWhite=2, cBlack=10):
-        self.root = MonteCarloNode(None)
+    def __init__(self, boardWidth, boardHeight, cWhite=2, cBlack=2):
         self.boardWidth = boardWidth
         self.boardHeight = boardHeight
         self.state = State(boardWidth, boardHeight)
+        self.root = MonteCarloNode(None, State(boardWidth, boardHeight), cWhite, cBlack)
         self.currNode = self.root
     
     def save_to_disk(self, path):
@@ -27,24 +27,22 @@ class MonteCarloTree:
         
     def one_training_iteration(self):
         node = self.root
-        move = None
-        state = self.state
-        while node.children != []:
+
+        while node.children != [] and not node.game_finished:
             node, move = node.select_child()
-            # if state.execute_move(move) == None:
-            #     print(move)
-            #     state.draw()
-            #     print(state.get_available_moves())
-            state.execute_move(move)
-            if(state.check_winner() != PlayerEnum.EMPTY):
-                node.backpropagate(state.check_winner())
-                return
-        if node.visits > 0:
-            node = node.expand(state)
-            winner = node.rollout(state)
-            node.backpropagate(winner)
+        
+        if node.game_finished:
+            # print(" ----------- Winner: ", node.state.check_winner())
+            node.backpropagate(node.state.check_winner())
+        elif not node.expanded:
+            new_node = node.expand()
+            node.delete_state()
+            winner = new_node.rollout()
+            # print(" ----------- Rolllout: ", winner)
+            new_node.backpropagate(winner)
         else:
-            winner = node.rollout(state)
+            winner = node.rollout()
+            # print(" ----------- Rolllout: ", winner)
             node.backpropagate(winner)
 
     def print_tree(self):
@@ -129,12 +127,12 @@ def play_simulation(state: State, mcts: MonteCarloTree):
             break
 
 if __name__ == '__main__':
-    mcts = MonteCarloTree.load_from_disk("test.mcts")
+    # mcts = MonteCarloTree.load_from_disk("test.mcts")
     #mcts.train(100000)
     # mcts.print_tree()
     #mcts.save_to_disk("test.mcts")
     # mcts = MonteCarloTree.load_from_disk("test.mcts")
-    play_simulation(State(), mcts)
+    # play_simulation(State(), mcts)
     # mcts.state.draw()
     # for i in range(10):
     #     move = mcts.get_best_move()
@@ -142,5 +140,10 @@ if __name__ == '__main__':
     #     mcts.state.draw()
     #     print(mcts.state.get_available_moves())
     #     print(mcts.currNode.children)
+
+    mcts = MonteCarloTree(3, 3, 2, 10)
+    mcts.train(100000)
+    mcts.print_tree()
+    # play_simulation(State(3, 3), mcts)
 
 

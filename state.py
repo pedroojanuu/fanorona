@@ -3,8 +3,8 @@ from move import Move, TypeOfMove
 import numpy as np
 
 class State:
-    def __init__(self):
-        self.board = Board()
+    def __init__(self, width=9, height=5):
+        self.board = Board(width, height)
         self.player = PlayerEnum.WHITE
         self.move_log = []
 

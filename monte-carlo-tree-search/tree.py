@@ -49,6 +49,7 @@ class MonteCarloTree:
         
     def get_best_move(self):
         if self.currNode == None or self.currNode.children.size == 0:
+        # if self.currNode == None or self.currNode.children == []:
             print("Random move")
             return random.choice(self.state.get_available_moves())
         
@@ -69,6 +70,7 @@ class MonteCarloTree:
     
     def update_move(self, move_to_exe):
         if self.currNode == None or self.currNode.children.size == 0:
+        # if self.currNode == None or self.currNode.children == []:
             self.state.execute_move(move_to_exe)
             return
             
@@ -78,6 +80,7 @@ class MonteCarloTree:
                 self.state.execute_move(move)
                 return
             
+        print("Player: ", self.state.player)
         print("Children: ", self.currNode.children)
         raise Exception("Move not found: ", move_to_exe, " in children: ", self.currNode.children)
     
@@ -89,10 +92,10 @@ class MonteCarloTree:
 def play_simulation(state: State, mcts: MonteCarloTree):
     state.draw()
 
-    for i in range(10):
+    for i in range(50):
         # print("Available moves: ", state.board.get_available_moves(state.player))
         if state.player == PlayerEnum.WHITE:
-            mcts.train_until(10000)
+            mcts.train_until(100)
             move_to_exe = mcts.get_best_move()
             # print(mcts.currNode.children)
             print("Best move: ", move_to_exe)
@@ -131,9 +134,13 @@ if __name__ == '__main__':
     #     print(mcts.state.get_available_moves())
     #     print(mcts.currNode.children)
 
-    mcts = MonteCarloTree(3, 3, 2, 10)
+    start = time.time()
+
+    mcts = MonteCarloTree(9, 5, 2, 10)
     # mcts.train_time(5)
     mcts.print_tree()
-    play_simulation(State(3, 3), mcts)
+    play_simulation(State(9, 5), mcts)
+
+    print("Time: ", time.time() - start)
 
 

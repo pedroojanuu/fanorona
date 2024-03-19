@@ -5,7 +5,7 @@ from node import MonteCarloNode
 from state import State
 from board import PlayerEnum
 import pickle
-
+import time
 import random
 
 class MonteCarloTree:
@@ -24,26 +24,6 @@ class MonteCarloTree:
     def load_from_disk(path):
         with open(path,  "rb") as f:
             return pickle.load(f)
-        
-    def one_training_iteration(self):
-        node = self.root
-
-        while node.children != [] and not node.game_finished:
-            node, move = node.select_child()
-        
-        if node.game_finished:
-            # print(" ----------- Winner: ", node.state.check_winner())
-            node.backpropagate(node.state.check_winner())
-        elif not node.expanded:
-            new_node = node.expand()
-            node.delete_state()
-            winner = new_node.rollout()
-            # print(" ----------- Rolllout: ", winner)
-            new_node.backpropagate(winner)
-        else:
-            winner = node.rollout()
-            # print(" ----------- Rolllout: ", winner)
-            node.backpropagate(winner)
 
     def print_tree(self):
         self.print_tree_aux(self.root, 0)
@@ -56,11 +36,19 @@ class MonteCarloTree:
 
     def train(self, iterations):
         for _ in range(iterations):
-            self.one_training_iteration()
-            self.state = State(self.boardWidth, self.boardHeight)
+            self.currNode.one_training_iteration()
+
+    def train_time(self, timeout):
+        start = time.time()
+        while time.time() - start < timeout:
+            self.currNode.one_training_iteration()
+
+    def train_until(self, total_iterations):
+        while self.currNode.visits < total_iterations:
+            self.currNode.one_training_iteration()
         
     def get_best_move(self):
-        if self.currNode == None or self.currNode.children == []:
+        if self.currNode == None or self.currNode.children.size == 0:
             print("Random move")
             return random.choice(self.state.get_available_moves())
         
@@ -80,7 +68,7 @@ class MonteCarloTree:
         return best_move
     
     def update_move(self, move_to_exe):
-        if self.currNode == None or self.currNode.children == []:
+        if self.currNode == None or self.currNode.children.size == 0:
             self.state.execute_move(move_to_exe)
             return
             
@@ -104,10 +92,12 @@ def play_simulation(state: State, mcts: MonteCarloTree):
     for i in range(10):
         # print("Available moves: ", state.board.get_available_moves(state.player))
         if state.player == PlayerEnum.WHITE:
+            mcts.train_until(10000)
             move_to_exe = mcts.get_best_move()
             # print(mcts.currNode.children)
             print("Best move: ", move_to_exe)
         else:
+            print("Available moves: ", state.get_available_moves())
             move_to_exe = random.choice(state.get_available_moves())
         print()
         print("Move to execute: ", move_to_exe)
@@ -142,8 +132,8 @@ if __name__ == '__main__':
     #     print(mcts.currNode.children)
 
     mcts = MonteCarloTree(3, 3, 2, 10)
-    mcts.train(100000)
+    # mcts.train_time(5)
     mcts.print_tree()
-    # play_simulation(State(3, 3), mcts)
+    play_simulation(State(3, 3), mcts)
 
 

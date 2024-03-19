@@ -5,6 +5,7 @@ from board import PlayerEnum
 from copy import deepcopy
 import random
 import math
+import numpy as np
 
 def all_max(iterable, key):
     max_value = float("-inf")
@@ -25,7 +26,7 @@ class MonteCarloNode:
         self.visits = 0
         self.parentNode = parentNode
         self.player = PlayerEnum.WHITE
-        self.children = []
+        self.children = np.array([])
         self.state = state
         self.cWhite = cWhite
         self.cBlack = cBlack
@@ -45,18 +46,22 @@ class MonteCarloNode:
             return self.total / self.visits + self.cBlack * (math.log(self.parentNode.visits) / self.visits) ** 0.5
         
     def select_child(self):
-        if self.children == []:
+        if self.children.size == 0:
             raise Exception("No children to select from")
-        return random.choice(all_max(self.children, key=lambda x: x[0].ucb1()))
+        # return random.choice(all_max(self.children, key=lambda x: x[0].ucb1()))
+        return max(self.children, key=lambda x: x[0].ucb1())
     
     def expand(self):
         self.expanded = True
         moves = self.state.get_available_moves()
+        self.children = np.empty(len(moves), dtype=object)
 
-        for move in moves:
+        for i in range(len(moves)):
+            move = moves[i]
             new_state = deepcopy(self.state)
             new_state.execute_move(move)
-            self.add_child(MonteCarloNode(self, new_state, self.cWhite, self.cBlack), move)
+            self.children[i] = (MonteCarloNode(self, new_state, self.cWhite, self.cBlack), move)
+            # self.add_child(MonteCarloNode(self, new_state, self.cWhite, self.cBlack), move)
 
         return random.choice(self.children)[0]
     
@@ -74,6 +79,28 @@ class MonteCarloNode:
         self.visits += 1
         if winner == PlayerEnum.WHITE and self.player == PlayerEnum.WHITE:
             self.total += 1
+        elif winner == PlayerEnum.BLACK and self.player == PlayerEnum.BLACK:
+            self.total += 1
         if self.parentNode is not None:
             self.parentNode.backpropagate(winner)
+
+    def one_training_iteration(self):
+        node = self
+
+        while node.children.size != 0 and not node.game_finished:
+            node, move = node.select_child()
+        
+        if node.game_finished:
+            # print(" ----------- Winner: ", node.state.check_winner())
+            node.backpropagate(node.state.check_winner())
+        elif not node.expanded:
+            new_node = node.expand()
+            node.delete_state()
+            winner = new_node.rollout()
+            # print(" ----------- Rolllout: ", winner)
+            new_node.backpropagate(winner)
+        else:
+            winner = node.rollout()
+            # print(" ----------- Rolllout: ", winner)
+            node.backpropagate(winner)
         

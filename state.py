@@ -39,8 +39,7 @@ class State:
 
         row_dest = move.row_destination
         col_dest = move.col_destination
-        match (move.type):
-            case TypeOfMove.APPROACH:
+        if move.type == TypeOfMove.APPROACH:
                 row_to_kill = move.row_destination
                 col_to_kill = move.col_destination
                 while True:
@@ -50,7 +49,7 @@ class State:
                         self.get_board_matrix()[row_to_kill][col_to_kill] = Player.EMPTY
                     else:
                         break
-            case TypeOfMove.WITHDRAWAL:
+        elif move.type == TypeOfMove.WITHDRAWAL:
                 while True:
                     row_to_kill = move.row_origin
                     col_to_kill = move.col_origin

@@ -1,8 +1,10 @@
+
 # import pygame
 import numpy as np
 import math
 from move import Move, TypeOfMove
 from typing import List
+
 from adjacent_positions import ADJACENT_4, ADJACENT_ALL
 from player import Player
 

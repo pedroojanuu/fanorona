@@ -49,7 +49,6 @@ class MonteCarloTree:
         
     def get_best_move(self):
         if self.currNode == None or self.currNode.children.size == 0:
-        # if self.currNode == None or self.currNode.children == []:
             print("Random move")
             return random.choice(self.state.get_available_moves())
         
@@ -70,7 +69,6 @@ class MonteCarloTree:
     
     def update_move(self, move_to_exe):
         if self.currNode == None or self.currNode.children.size == 0:
-        # if self.currNode == None or self.currNode.children == []:
             self.state.execute_move(move_to_exe)
             return
             
@@ -93,11 +91,9 @@ def play_simulation(state: State, mcts: MonteCarloTree):
     state.draw()
 
     for i in range(50):
-        # print("Available moves: ", state.board.get_available_moves(state.player))
         if state.player == PlayerEnum.WHITE:
             mcts.train_until(100)
             move_to_exe = mcts.get_best_move()
-            # print(mcts.currNode.children)
             print("Best move: ", move_to_exe)
         else:
             print("Available moves: ", state.get_available_moves())
@@ -120,26 +116,12 @@ def play_simulation(state: State, mcts: MonteCarloTree):
             break
 
 if __name__ == '__main__':
-    # mcts = MonteCarloTree.load_from_disk("test.mcts")
-    #mcts.train(100000)
-    # mcts.print_tree()
-    #mcts.save_to_disk("test.mcts")
-    # mcts = MonteCarloTree.load_from_disk("test.mcts")
-    # play_simulation(State(), mcts)
-    # mcts.state.draw()
-    # for i in range(10):
-    #     move = mcts.get_best_move()
-    #     mcts.update_move(move)
-    #     mcts.state.draw()
-    #     print(mcts.state.get_available_moves())
-    #     print(mcts.currNode.children)
-
     start = time.time()
 
-    mcts = MonteCarloTree(9, 5, 2, 10)
+    mcts = MonteCarloTree(5, 3, 2, 10)
     # mcts.train_time(5)
     mcts.print_tree()
-    play_simulation(State(9, 5), mcts)
+    play_simulation(State(5, 3), mcts)
 
     print("Time: ", time.time() - start)
 

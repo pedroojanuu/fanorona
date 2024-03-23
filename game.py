@@ -9,6 +9,8 @@ from heuristics.win_heuristic import WinHeuristic
 from heuristics.adjacent_pieces_heuristic import AdjacentPiecesHeuristic
 from heuristics.nr_pieces_heuristic import NrPiecesHeuristic
 
+from monte_carlo_tree_search.tree import MonteCarloTree
+
 class WindowState(Enum):
     BOARD_SIZE_SEL = 0
     WHITE_MODE_SEL = 1
@@ -50,6 +52,9 @@ class Game:
         self.white_mode = None
         self.black_mode = None
         self.available_moves = None
+
+        self.white_alg = None
+        self.black_alg = None
     
     def size_sel(self):
         for i in range(5, 11):
@@ -78,11 +83,17 @@ class Game:
     
     def mode_sel(self):
         # TODO
+
         # temp
         self.window_state = WindowState.PLAYING
         self.white_mode = PlayerModes.HUMAN
         self.black_mode = PlayerModes.HUMAN
         # temp
+
+        if self.white_mode == PlayerModes.MCTS_QUICK:
+            self.white_alg = MonteCarloTree(self.game_state.board.width, self.game_state.board.height)
+            self.white_alg.state = self.game_state
+
         return
 
     def board(self):
@@ -118,7 +129,7 @@ class Game:
         textRect.center = (100, self.height*70+7)
         self.canvas.blit(text, textRect)
 
-        if (self.game_state.player == Player.WHITE and self.white_mode == PlayerModes.HUMAN) or (self.game_state.player == Player.BLACK and self.black_mode == PlayerModes.HUMAN):
+        if (self.white_mode == PlayerModes.HUMAN and self.game_state.player == Player.WHITE) or (self.black_mode == PlayerModes.HUMAN and self.game_state.player == Player.BLACK):
             for move in self.available_moves:
                 if self.selected_piece == (move.row_origin, move.col_origin):
                     pygame.draw.circle(self.canvas, (0,255,0), (70*move.col_destination+35, 70*move.row_destination+35), 30, 3)
@@ -141,6 +152,9 @@ class Game:
                                 self.selected_piece = None
                                 pygame.display.update()
                                 return
+        elif self.game_state.player == Player.WHITE:
+            if self.white_mode == PlayerModes.MCTS_QUICK:
+                self.white_alg.state = self.game_state
 
         pygame.display.update()
     

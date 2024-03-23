@@ -20,6 +20,8 @@ class Move:
         return f"({self.row_origin}, {self.col_origin}) -> ({self.row_destination}, {self.col_destination}) {self.type}"
     
     def __eq__(self, __value: object) -> bool:
+        if __value == None:
+            return False
         return self.row_origin == __value.row_origin and self.col_origin == __value.col_origin and self.row_destination == __value.row_destination and self.col_destination == __value.col_destination and self.type == __value.type
     
     def get_destination(self):

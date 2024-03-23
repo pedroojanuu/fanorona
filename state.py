@@ -26,7 +26,6 @@ class State:
         else:
             all_tile_moves = self.board.get_tile_moves(self.move_log[-1].row_destination, self.move_log[-1].col_destination)
             return list(filter(lambda x: not self.in_move_log(x), all_tile_moves))
-            
     
     def execute_move(self, move: Move):
         if move not in self.board.get_all_moves(self.player) and not self.in_move_log(move):

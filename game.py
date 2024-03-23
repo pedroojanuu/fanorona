@@ -3,6 +3,12 @@ from state import State
 from player import Player
 from enum import Enum
 
+from heuristics.groups_heuristic import GroupsHeuristic
+from heuristics.center_control_heuristic import CenterControlHeuristic
+from heuristics.win_heuristic import WinHeuristic
+from heuristics.adjacent_pieces_heuristic import AdjacentPiecesHeuristic
+from heuristics.nr_pieces_heuristic import NrPiecesHeuristic
+
 class WindowState(Enum):
     BOARD_SIZE_SEL = 0
     WHITE_MODE_SEL = 1
@@ -34,13 +40,16 @@ class Game:
 
         self.window_state = WindowState.BOARD_SIZE_SEL
 
-        self.selected_tile = None
+        self.selected_piece = None
 
         self.width = None
         self.height = None
 
         self.game_state = None
         self.winner = Player.EMPTY
+        self.white_mode = None
+        self.black_mode = None
+        self.available_moves = None
     
     def size_sel(self):
         for i in range(5, 11):
@@ -50,7 +59,6 @@ class Game:
                 textRect.center = ((i-4)*50, (j-4)*60)
                 self.canvas.blit(text, textRect)
 
-        # TODO: process input
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 x, y = pygame.mouse.get_pos()
@@ -62,6 +70,7 @@ class Game:
                     self.height = row
                     self.canvas = pygame.display.set_mode((self.width*70, self.height*70 + 15))
                     self.game_state = State(self.width, self.height)
+                    self.available_moves = self.game_state.get_available_moves()
                     self.window_state = WindowState.WHITE_MODE_SEL
                     return
 
@@ -69,6 +78,11 @@ class Game:
     
     def mode_sel(self):
         # TODO
+        # temp
+        self.window_state = WindowState.PLAYING
+        self.white_mode = PlayerModes.HUMAN
+        self.black_mode = PlayerModes.HUMAN
+        # temp
         return
 
     def board(self):
@@ -76,44 +90,57 @@ class Game:
 
         # Static elements
         for i in range(self.width):
-            pygame.board.line(self.canvas, (255,255,255), (70*i+35, 35), (70*i+35, 70*self.height-35), 2)
+            pygame.draw.line(self.canvas, (255,255,255), (70*i+35, 35), (70*i+35, 70*self.height-35), 2)
         for i in range(self.height):
-            pygame.board.line(self.canvas, (255,255,255), (35, 70*i+35), (70*self.width-35, 70*i+35), 2)
+            pygame.draw.line(self.canvas, (255,255,255), (35, 70*i+35), (70*self.width-35, 70*i+35), 2)
         for i in range(self.width-1):
             for j in range(self.height-1):
                 if (i+j)%2 == 0:
-                    pygame.board.line(self.canvas, (255,255,255), (70*i+35, 70*j+35), (70*i+105, 70*j+105), 2)
+                    pygame.draw.line(self.canvas, (255,255,255), (70*i+35, 70*j+35), (70*i+105, 70*j+105), 2)
                 else:
-                    pygame.board.line(self.canvas, (255,255,255), (70*i+105, 70*j+35), (70*i+35, 70*j+105), 2)
+                    pygame.draw.line(self.canvas, (255,255,255), (70*i+105, 70*j+35), (70*i+35, 70*j+105), 2)
 
         for row in range(self.height):
             for col in range(self.width):
                 if self.game_state.board.board[row][col] == Player.WHITE:
-                    pygame.board.circle(self.canvas, (255,255,255), (70*col+35, 70*row+35), 30)
+                    pygame.draw.circle(self.canvas, (255,255,255), (70*col+35, 70*row+35), 30)
                 elif self.game_state.board.board[row][col] == Player.BLACK:
-                    pygame.board.circle(self.canvas, (0,0,0), (70*col+35, 70*row+35), 30)
+                    pygame.draw.circle(self.canvas, (0,0,0), (70*col+35, 70*row+35), 30)
         
-        if self.selected_tile != None:
-            pygame.board.circle(self.canvas, (235,235,52), (70*self.selected_tile[1]+35, 70*self.selected_tile[0]+35), 30, 3)
+        if self.selected_piece != None:
+            pygame.draw.circle(self.canvas, (235,235,52), (70*self.selected_piece[1]+35, 70*self.selected_piece[0]+35), 30, 3)
         
         if self.game_state.player == Player.BLACK:
             text = self.font.render("Vez das pretas", True, (0,0,0), (184,59,50))
         elif self.game_state.player == Player.WHITE:
             text = self.font.render("Vez das brancas", True, (255,255,255), (184,59,50))
         textRect = text.get_rect()
-        textRect.center = (50, self.height*70+7)
+        textRect.center = (100, self.height*70+7)
         self.canvas.blit(text, textRect)
 
-        # TODO: Move selection/execution/board update
-        for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                x, y = pygame.mouse.get_pos()
-                col = x // 70
-                row = y // 70
-                if self.game_state.board.board[row][col] == self.game_state.player:
-                    self.selected_tile = (row, col)
-                else:
-                    self.selected_tile = None
+        if (self.game_state.player == Player.WHITE and self.white_mode == PlayerModes.HUMAN) or (self.game_state.player == Player.BLACK and self.black_mode == PlayerModes.HUMAN):
+            for move in self.available_moves:
+                if self.selected_piece == (move.row_origin, move.col_origin):
+                    pygame.draw.circle(self.canvas, (0,255,0), (70*move.col_destination+35, 70*move.row_destination+35), 30, 3)
+            
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+                    pygame.quit()
+                    exit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    x, y = pygame.mouse.get_pos()
+                    col = x // 70
+                    row = y // 70
+                    if self.game_state.board.board[row][col] == self.game_state.player:
+                        self.selected_piece = (row, col)
+                    elif self.game_state.board.board[row][col] == Player.EMPTY:
+                        for move in self.available_moves:
+                            if self.selected_piece == (move.row_origin, move.col_origin) and (row, col) == (move.row_destination, move.col_destination):
+                                self.game_state.execute_move(move)
+                                self.available_moves = self.game_state.get_available_moves()
+                                self.selected_piece = None
+                                pygame.display.update()
+                                return
 
         pygame.display.update()
     
@@ -152,7 +179,7 @@ class Game:
                     pygame.quit()
                     return
             if self.window_state == WindowState.PLAYING:
-                self.winner = self.game_state.check_winner
+                self.winner = self.game_state.check_winner()
                 if self.winner != Player.EMPTY:
                     self.window_state = WindowState.GAME_OVER
                     continue

@@ -1,4 +1,3 @@
-from time import sleep
 import pygame
 from state import State
 from player import Player
@@ -11,6 +10,16 @@ class WindowState(Enum):
     PLAYING = 3
     GAME_OVER = 4
 
+class PlayerModes(Enum):
+    HUMAN = 0
+    MINIMAX_WIN = 1
+    MINIMAX_NR_PIECES = 2
+    MINIMAX_ADJACENT_PIECES = 3
+    MINIMAX_GROUPS = 4
+    MINIMAX_CENTER_CONTROL = 5
+    MCTS_QUICK = 6
+    MCTS_BETTER = 7
+
 class Game:
     def __init__(self):
         pygame.init()
@@ -20,20 +29,18 @@ class Game:
         pygame.display.set_caption("Fanorona")
         pygame.display.update()
 
-        self.window_state = WindowState.GAME_OVER # MUDAR PARA BOARD_SIZE_SEL !!!!
+        self.frame_rate = 30
+        self.frame_time_counter = 0
+
+        self.window_state = WindowState.BOARD_SIZE_SEL
 
         self.selected_tile = None
-                
+
         self.width = None
         self.height = None
 
-        self.state = None
-        self.winner = Player.WHITE # MUDAR PARA EMPTY!!!!!
-
-        # TEMP
-        self.width = 5
-        self.height = 5
-        self.canvas = pygame.display.set_mode((self.width*70, self.height*70 + 15))
+        self.game_state = None
+        self.winner = Player.EMPTY
     
     def size_sel(self):
         for i in range(5, 11):
@@ -42,11 +49,21 @@ class Game:
                 textRect = text.get_rect()
                 textRect.center = ((i-4)*50, (j-4)*60)
                 self.canvas.blit(text, textRect)
-        
-        # TODO: process input
 
-        self.canvas = pygame.display.set_mode((self.width*70, self.height*70 + 15))
-        self.state = State(self.width, self.height)
+        # TODO: process input
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                x, y = pygame.mouse.get_pos()
+                col = ((x+25) // 50) + 4
+                row = ((y+25) // 60) + 4
+                
+                if 5 <= col <= 10 and 5 <= row <= 10:
+                    self.width = col
+                    self.height = row
+                    self.canvas = pygame.display.set_mode((self.width*70, self.height*70 + 15))
+                    self.game_state = State(self.width, self.height)
+                    self.window_state = WindowState.WHITE_MODE_SEL
+                    return
 
         pygame.display.update()
     
@@ -55,7 +72,7 @@ class Game:
         return
 
     def board(self):
-        # self.canvas.fill((184, 59, 50)) # Background
+        self.canvas.fill((184, 59, 50)) # Background
 
         # Static elements
         for i in range(self.width):
@@ -71,17 +88,17 @@ class Game:
 
         for row in range(self.height):
             for col in range(self.width):
-                if self.state.board.board[row][col] == Player.WHITE:
+                if self.game_state.board.board[row][col] == Player.WHITE:
                     pygame.board.circle(self.canvas, (255,255,255), (70*col+35, 70*row+35), 30)
-                elif self.state.board.board[row][col] == Player.BLACK:
+                elif self.game_state.board.board[row][col] == Player.BLACK:
                     pygame.board.circle(self.canvas, (0,0,0), (70*col+35, 70*row+35), 30)
         
         if self.selected_tile != None:
             pygame.board.circle(self.canvas, (235,235,52), (70*self.selected_tile[1]+35, 70*self.selected_tile[0]+35), 30, 3)
         
-        if self.state.player == Player.BLACK:
+        if self.game_state.player == Player.BLACK:
             text = self.font.render("Vez das pretas", True, (0,0,0), (184,59,50))
-        elif self.state.player == Player.WHITE:
+        elif self.game_state.player == Player.WHITE:
             text = self.font.render("Vez das brancas", True, (255,255,255), (184,59,50))
         textRect = text.get_rect()
         textRect.center = (50, self.height*70+7)
@@ -93,7 +110,7 @@ class Game:
                 x, y = pygame.mouse.get_pos()
                 col = x // 70
                 row = y // 70
-                if self.state.board.board[row][col] == self.state.player:
+                if self.game_state.board.board[row][col] == self.game_state.player:
                     self.selected_tile = (row, col)
                 else:
                     self.selected_tile = None
@@ -116,7 +133,6 @@ class Game:
         textRect.center = (self.width*35, self.height*35+30)
         self.canvas.blit(text, textRect)
 
-
         text = self.font.render("Félix Martins, Pedro Lima e Pedro Januário", True, (0,0,0), (184,59,50))
         textRect = text.get_rect()
         textRect.center = (self.width*35, self.height*35+50)
@@ -136,7 +152,7 @@ class Game:
                     pygame.quit()
                     return
             if self.window_state == WindowState.PLAYING:
-                self.winner = self.state.check_winner
+                self.winner = self.game_state.check_winner
                 if self.winner != Player.EMPTY:
                     self.window_state = WindowState.GAME_OVER
                     continue

@@ -54,13 +54,13 @@ class AdjacentPiecesHeuristic(Heuristic):
 
 
 def test_adjacent_pieces_heuristic():
-    s = State()
+    s = State(5, 3)
     h = AdjacentPiecesHeuristic()
 
     s.get_board_matrix().fill(Player.EMPTY)  # clear the board
 
-    s.get_board_matrix()[0][0:6] = Player.BLACK
-    s.get_board_matrix()[1][0:4] = Player.WHITE
+    s.get_board_matrix()[0][0:3] = Player.BLACK
+    s.get_board_matrix()[1][0:2] = Player.WHITE
 
     print(s.get_board_matrix())
     white_eval = h.evaluate_board(s, Player.WHITE)

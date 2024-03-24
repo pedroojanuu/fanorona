@@ -25,7 +25,6 @@ class HeuristicsList(Heuristic):
     def evaluate_board(self, state, player_to_win):
         map_func = lambda h, w: h.evaluate_board(state, player_to_win) * w
         map_list = np.vectorize(map_func)(self.heuristics, self.weights)
-        print(map_list)
         return sum(map_list)
 
 

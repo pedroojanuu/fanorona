@@ -1,2 +1,4 @@
 .vscode
 __pycache__
+monte-carlo-tree-search/__pycache__
+heuristics/__pycache__

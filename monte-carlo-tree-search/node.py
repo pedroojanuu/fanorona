@@ -66,12 +66,14 @@ class MonteCarloNode:
         state = deepcopy(self.state)
         while state.check_winner() == Player.EMPTY:
             if(state.get_available_moves() == []):
-                print("No moves")
+                self.state.draw()
+                raise Exception("No moves available")
             state.execute_move(random.choice(state.get_available_moves()))
         return state.check_winner()
     
     def delete_state(self):
-        self.state = None
+        # self.state = None
+        pass
     
     def backpropagate(self, winner):
         self.visits += 1

@@ -48,10 +48,6 @@ class MonteCarloTree:
             self.currNode.one_training_iteration()
         
     def get_best_move(self):
-        if self.currNode == None or self.currNode.children.size == 0:
-            print("Random move")
-            return random.choice(self.state.get_available_moves())
-        
         best_move = None
         best_score = float("-inf")
         found = False
@@ -80,6 +76,7 @@ class MonteCarloTree:
             
         print("Player: ", self.state.player)
         print("Children: ", self.currNode.children)
+        self.currNode.state.draw()
         raise Exception("Move not found: ", move_to_exe, " in children: ", self.currNode.children)
     
     def reset_game(self):
@@ -87,12 +84,12 @@ class MonteCarloTree:
         self.currNode = self.root
     
 
-def play_simulation(state: State, mcts: MonteCarloTree):
+def play_simulation(state: State, mcts: MonteCarloTree, no_rollouts=100):
     state.draw()
 
-    for i in range(50):
+    while True:
         if state.player == Player.WHITE:
-            mcts.train_until(100)
+            mcts.train_until(no_rollouts)
             move_to_exe = mcts.get_best_move()
             print("Best move: ", move_to_exe)
         else:
@@ -120,7 +117,6 @@ if __name__ == '__main__':
 
     mcts = MonteCarloTree(5, 3, 2, 10)
     # mcts.train_time(5)
-    mcts.print_tree()
     play_simulation(State(5, 3), mcts)
 
     print("Time: ", time.time() - start)

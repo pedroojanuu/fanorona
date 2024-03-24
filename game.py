@@ -2,14 +2,18 @@ import pygame
 from state import State
 from player import Player
 from enum import Enum
+from typing import Callable
+import random
 
 from heuristics.groups_heuristic import GroupsHeuristic
 from heuristics.center_control_heuristic import CenterControlHeuristic
 from heuristics.win_heuristic import WinHeuristic
 from heuristics.adjacent_pieces_heuristic import AdjacentPiecesHeuristic
 from heuristics.nr_pieces_heuristic import NrPiecesHeuristic
+from heuristics.heuristics_list import HeuristicsList
 
 from monte_carlo_tree_search.tree import MonteCarloTree
+
 
 class WindowState(Enum):
     BOARD_SIZE_SEL = 0
@@ -28,6 +32,7 @@ class PlayerModes(Enum):
     MCTS_QUICK = 6
     MCTS_BETTER = 7
 
+
 class Game:
     def __init__(self):
         pygame.init()
@@ -41,7 +46,6 @@ class Game:
         self.frame_time_counter = 0
 
         self.window_state = WindowState.BOARD_SIZE_SEL
-
         self.selected_piece = None
 
         self.width = None
@@ -55,7 +59,7 @@ class Game:
 
         self.white_alg = None
         self.black_alg = None
-    
+
     def size_sel(self):
         for i in range(5, 11):
             for j in range(5, 11):

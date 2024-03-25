@@ -1,3 +1,7 @@
+if __name__ == '__main__':
+    from import_from_parent import import_from_parent
+    import_from_parent()
+
 from tree import MonteCarloTree, play_simulation
 from node_heuristics import MonteCarloNodeHeuristic
 from state import State

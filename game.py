@@ -2,15 +2,16 @@ import pygame
 from state import State
 from player import Player
 from enum import Enum
-from typing import Callable
-import random
 
+import minimax
+from heuristics.heuristic import Heuristic
+from heuristics.nr_pieces_heuristic import NrPiecesHeuristic
+from heuristics.adjacent_pieces_heuristic import AdjacentPiecesHeuristic
+from heuristics.heuristics_list import HeuristicsList
+from heuristics.win_heuristic import WinHeuristic
 from heuristics.groups_heuristic import GroupsHeuristic
 from heuristics.center_control_heuristic import CenterControlHeuristic
-from heuristics.win_heuristic import WinHeuristic
-from heuristics.adjacent_pieces_heuristic import AdjacentPiecesHeuristic
-from heuristics.nr_pieces_heuristic import NrPiecesHeuristic
-from heuristics.heuristics_list import HeuristicsList
+from heuristics.approximate_enemy_heuristic import ApproximateEnemyHeuristic
 
 from monte_carlo_tree_search.tree import MonteCarloTree
 
@@ -31,7 +32,6 @@ class PlayerModes(Enum):
     MINIMAX_CENTER_CONTROL = 5
     MCTS_QUICK = 6
     MCTS_BETTER = 7
-
 
 class Game:
     def __init__(self):
@@ -94,9 +94,17 @@ class Game:
         self.black_mode = PlayerModes.HUMAN
         # temp
 
-        if self.white_mode == PlayerModes.MCTS_QUICK:
-            self.white_alg = MonteCarloTree(self.game_state.board.width, self.game_state.board.height)
-            self.white_alg.state = self.game_state
+        if self.window_state == WindowState.WHITE_MODE_SEL:
+            if self.white_mode == PlayerModes.MINIMAX_WIN:
+                self.white_alg = minimax.execute_minimax_move(WinHeuristic().evaluate_board, 4)
+            elif self.white_mode == PlayerModes.MINIMAX_NR_PIECES:
+                self.white_alg = minimax.execute_minimax_move(NrPiecesHeuristic().evaluate_board, 4)
+            elif self.white_mode == PlayerModes.MINIMAX_ADJACENT_PIECES:
+                self.white_alg = minimax.execute_minimax_move(AdjacentPiecesHeuristic().evaluate_board, 4)
+            elif self.white_mode == PlayerModes.MINIMAX_GROUPS:
+                self.white_alg = minimax.execute_minimax_move(GroupsHeuristic().evaluate_board, 4)
+            elif self.white_mode == PlayerModes.MINIMAX_CENTER_CONTROL:
+                self.white_alg = minimax.execute_minimax_move(CenterControlHeuristic().evaluate_board, 4)
 
         return
 
@@ -157,8 +165,8 @@ class Game:
                                 pygame.display.update()
                                 return
         elif self.game_state.player == Player.WHITE:
-            if self.white_mode == PlayerModes.MCTS_QUICK:
-                self.white_alg.state = self.game_state
+            if 1 <= self.white_mode <= 5:
+                self.game_state = self.white_alg(self.game_state)
 
         pygame.display.update()
     

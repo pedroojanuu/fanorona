@@ -91,21 +91,21 @@ class Game:
         # TODO
 
         # temp
-        self.white_mode = PlayerModes.MCTS_QUICK
+        self.white_mode = PlayerModes.MINIMAX_WIN
         self.black_mode = PlayerModes.HUMAN
         # temp
 
         if self.window_state == WindowState.WHITE_MODE_SEL:
             if self.white_mode == PlayerModes.MINIMAX_WIN:
-                self.white_alg = minimax.execute_minimax_move(WinHeuristic().evaluate_board, 4)
+                self.white_alg = minimax.get_minimax_move(WinHeuristic().evaluate_board, 4)
             elif self.white_mode == PlayerModes.MINIMAX_NR_PIECES:
-                self.white_alg = minimax.execute_minimax_move(NrPiecesHeuristic().evaluate_board, 4)
+                self.white_alg = minimax.get_minimax_move(NrPiecesHeuristic().evaluate_board, 4)
             elif self.white_mode == PlayerModes.MINIMAX_ADJACENT_PIECES:
-                self.white_alg = minimax.execute_minimax_move(AdjacentPiecesHeuristic().evaluate_board, 4)
+                self.white_alg = minimax.get_minimax_move(AdjacentPiecesHeuristic().evaluate_board, 4)
             elif self.white_mode == PlayerModes.MINIMAX_GROUPS:
-                self.white_alg = minimax.execute_minimax_move(GroupsHeuristic().evaluate_board, 4)
+                self.white_alg = minimax.get_minimax_move(GroupsHeuristic().evaluate_board, 4)
             elif self.white_mode == PlayerModes.MINIMAX_CENTER_CONTROL:
-                self.white_alg = minimax.execute_minimax_move(CenterControlHeuristic().evaluate_board, 4)
+                self.white_alg = minimax.get_minimax_move(CenterControlHeuristic().evaluate_board, 4)
             elif self.white_mode == PlayerModes.MCTS_QUICK or self.white_mode == PlayerModes.MCTS_BETTER:
                 self.white_alg = MonteCarloTree(self.width, self.height, 2, 10) # preto colocar 10-2
             elif self.white_mode == PlayerModes.MCTS_HEURISTICS:
@@ -174,32 +174,34 @@ class Game:
                     elif self.game_state.board.board[row][col] == Player.EMPTY:
                         for move in self.available_moves:
                             if self.selected_piece == (move.row_origin, move.col_origin) and (row, col) == (move.row_destination, move.col_destination):
-                                self.game_state.execute_move(move)
+                                self.game_state = self.game_state.execute_move(move)
                                 self.available_moves = self.game_state.get_available_moves()
                                 self.selected_piece = None
                                 pygame.display.update()
                                 return
         elif self.game_state.player == Player.WHITE:
+            move = None
             if self.white_mode == PlayerModes.MINIMAX_WIN or self.white_mode == PlayerModes.MINIMAX_NR_PIECES or self.white_mode == PlayerModes.MINIMAX_ADJACENT_PIECES or self.white_mode == PlayerModes.MINIMAX_GROUPS or self.white_mode == PlayerModes.MINIMAX_CENTER_CONTROL:
-                print(self.game_state.board.board)
-                self.game_state = self.white_alg(self.game_state)
-                print("White move")
-                print(self.game_state.board.board)
+                move = self.white_alg(self.game_state)
+                self.game_state = self.game_state.execute_move(move)
             elif self.white_mode == PlayerModes.MCTS_QUICK:
                 self.white_alg.train_until(100)
                 move = self.white_alg.get_best_move()
-                self.game_state.execute_move(move)
+                self.game_state = self.game_state.execute_move(move)
                 self.white_alg.update_move(move)
             elif self.white_mode == PlayerModes.MCTS_BETTER:
                 self.white_alg.train_until(10000)
                 move = self.white_alg.get_best_move()
-                self.game_state.execute_move(move)
+                self.game_state = self.game_state.execute_move(move)
                 self.white_alg.update_move(move)
             elif self.white_mode == PlayerModes.MCTS_HEURISTICS:
                 self.white_alg.train_until(1000)
                 move = self.white_alg.get_best_move()
-                self.game_state.execute_move(move)
+                self.game_state = self.game_state.execute_move(move)
                 self.white_alg.update_move(move)
+                
+            if self.black_mode == PlayerModes.MCTS_QUICK or self.black_mode == PlayerModes.MCTS_BETTER or self.black_mode == PlayerModes.MCTS_HEURISTICS:
+                self.black_alg.update_move(move)
 
         pygame.display.update()
     

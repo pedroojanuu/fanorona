@@ -2,3 +2,4 @@
 __pycache__
 heuristics/__pycache__
 monte-carlo-tree-search/__pycache__
+.venv/

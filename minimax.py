@@ -6,15 +6,19 @@ from heuristics.heuristics_list import HeuristicsList
 from heuristics.win_heuristic import WinHeuristic
 from heuristics.groups_heuristic import GroupsHeuristic
 from heuristics.center_control_heuristic import CenterControlHeuristic
+from moves.move import Move
 from player import Player
 from state import State
 
 
-def execute_random_move(state: State) -> State:
+def get_random_move(state: State) -> Move:
     moves = state.get_available_moves()
     if moves == []:  # No moves available
-        return state
-    move = random.choice(moves)
+        return None
+    return random.choice(moves)
+
+def execute_random_move(state: State) -> State:
+    move = get_random_move(state)
     state = state.execute_move(move)
     return state
 
@@ -48,9 +52,9 @@ def minimax(state: State, depth, alpha, beta, player_to_win, evaluate_func):
         return min_eval
 
 
-def execute_minimax_move(evaluate_func, depth: int) -> State:
-    def execute_minimax_move_aux(state: State):
-        best_state = None
+def get_minimax_move(evaluate_func, depth: int) -> Move:
+    def get_minimax_move_aux(state: State) -> Move:
+        best_move = None
 
         alpha = best_eval = -math.inf
         beta = math.inf
@@ -62,9 +66,13 @@ def execute_minimax_move(evaluate_func, depth: int) -> State:
 
             if nstate_eval > best_eval:
                 alpha = best_eval = nstate_eval
-                best_state = nstate
+                best_move = mv
 
-        return best_state
+        return best_move
 
+    return get_minimax_move_aux
+
+def execute_minimax_move(evaluate_func, depth: int) -> State:
+    def execute_minimax_move_aux(state: State):
+        return state.execute_move(get_minimax_move(evaluate_func, depth)(state))
     return execute_minimax_move_aux
-

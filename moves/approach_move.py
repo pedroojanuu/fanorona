@@ -39,4 +39,6 @@ class ApproachMove(MotionMove):
                 state.get_board_matrix()[row_to_kill][col_to_kill] = Player.EMPTY
             else:
                 break
+
+        state.count = 0
         return state

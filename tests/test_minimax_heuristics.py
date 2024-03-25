@@ -9,7 +9,6 @@ from tests.test import test
 from state import State
 from player import Player
 from game import Game
-from game_simulator import GameSimulator
 from heuristics.heuristic import Heuristic
 from heuristics.nr_pieces_heuristic import NrPiecesHeuristic
 from heuristics.adjacent_pieces_heuristic import AdjacentPiecesHeuristic
@@ -17,20 +16,22 @@ from heuristics.heuristics_list import HeuristicsList
 from heuristics.win_heuristic import WinHeuristic
 from heuristics.groups_heuristic import GroupsHeuristic
 from heuristics.center_control_heuristic import CenterControlHeuristic
+from heuristics.approximate_enemy_heuristic import ApproximateEnemyHeuristic
+
 from minimax import execute_minimax_move, execute_random_move
 
 
-def run_n_times(ai_white, ai_black, nr: int):
+def run_n_times(ai_white, ai_black, nr: int, log_states=True):
     wins = {}
     for _ in range(nr):
-        game = GameSimulator()
+        state = State()
         try:
-            winner = game.run_ais(ai_white, ai_black, log_states=False)
+            winner = state.run_ais(ai_white, ai_black, log_states=log_states)
             wins[winner] = wins.get(winner, 0) + 1
         except Exception as e:
             print(e)
-            game.state.draw()
-            print(game.state.get_available_moves())
+            state.draw()
+            print(state.get_available_moves())
             raise e
     return wins
 
@@ -181,17 +182,102 @@ def test_different_weights_pieces_adjacent_groups(nr: int):
         nr=nr,
     )
 
+@test
+def test_best_heuristic(nr: int):
+    test_heuristic(
+        execute_minimax_move(
+            HeuristicsList(
+                [
+                    NrPiecesHeuristic(),
+                    ApproximateEnemyHeuristic(),
+                ],
+                [2, 1],
+            ).evaluate_board,
+            4,
+        ),
+        execute_minimax_move(
+            HeuristicsList(
+                [
+                    NrPiecesHeuristic(),
+                    AdjacentPiecesHeuristic(),
+                    GroupsHeuristic(),
+                ],
+                [10, 2, 1],
+            ).evaluate_board,
+            2,
+        ),
+        nr=nr,
+    )
+
+@test
+def test_best_heuristic2(nr: int):
+    test_heuristic(
+        execute_minimax_move(
+            HeuristicsList(
+                [
+                    NrPiecesHeuristic(),
+                    ApproximateEnemyHeuristic(),
+                ],
+                [2, 1],
+            ).evaluate_board,
+            4,
+        ),
+        execute_minimax_move(
+            HeuristicsList(
+                [
+                    NrPiecesHeuristic(),
+                    AdjacentPiecesHeuristic(),
+                    GroupsHeuristic(),
+                ],
+                [10, 2, 1],
+            ).evaluate_board,
+            4,
+        ),
+        nr=nr,
+    )
+@test
+def test_best_heuristic3(nr: int):
+    test_heuristic(
+        execute_minimax_move(
+            HeuristicsList(
+                [
+                    NrPiecesHeuristic(),
+                    AdjacentPiecesHeuristic(),
+                    GroupsHeuristic(),
+                ],
+                [10, 2, 1],
+            ).evaluate_board,
+            4,
+        ),
+        execute_minimax_move(
+            HeuristicsList(
+                [
+                    NrPiecesHeuristic(),
+                    ApproximateEnemyHeuristic(),
+                ],
+                [2, 1],
+            ).evaluate_board,
+            4,
+        ),
+        nr=nr,
+    )
+
+
+
 
 if __name__ == "__main__":
     nr = 100  # The same for all to allow easy time comparison
-    test_random_vs_random(nr)
+    # test_random_vs_random(nr)
 
-    test_random_vs_pieces(nr)
-    test_win_vs_random(nr)
-    test_win_pieces_vs_random(nr)
-    test_win_adjacent_vs_random(nr)
-    test_win_groups_vs_random(nr)
-    test_win_center_vs_random(nr)
-    test_pieces_adjacent_groups_vs_random(nr)
+    # test_random_vs_pieces(nr)
+    # test_win_vs_random(nr)
+    # test_win_pieces_vs_random(nr)
+    # test_win_adjacent_vs_random(nr)
+    # test_win_groups_vs_random(nr)
+    # test_win_center_vs_random(nr)
+    # test_pieces_adjacent_groups_vs_random(nr)
 
-    test_different_weights_pieces_adjacent_groups(nr)
+    # test_different_weights_pieces_adjacent_groups(nr)
+    # test_best_heuristic(1)
+    # test_best_heuristic2(1)
+    test_best_heuristic3(1)

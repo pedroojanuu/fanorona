@@ -7,23 +7,21 @@ from heuristics.win_heuristic import WinHeuristic
 from heuristics.groups_heuristic import GroupsHeuristic
 from heuristics.center_control_heuristic import CenterControlHeuristic
 from player import Player
-from game import Game
+from state import State
 
 
-def execute_random_move(game: Game) -> bool:
-    moves = game.state.get_available_moves()
-    if moves == []:  # No moves available (forfeit the game)
-        return True
+def execute_random_move(state: State) -> State:
+    moves = state.get_available_moves()
+    if moves == []:  # No moves available
+        return state
     move = random.choice(moves)
-    game.state = game.state.execute_move(move)
-    return False
+    state = state.execute_move(move)
+    return state
 
 
-def minimax(state, depth, alpha, beta, player_to_win, evaluate_func):
+def minimax(state: State, depth, alpha, beta, player_to_win, evaluate_func):
     if depth == 0 or state.check_winner() != Player.EMPTY:
         return evaluate_func(state, player_to_win)
-        # evaluate_func gives the score from the perspective of player 1
-        # if we are player 2, we need to invert the score
 
     if player_to_win == state.player:  # MAX
         max_eval = -math.inf
@@ -50,24 +48,23 @@ def minimax(state, depth, alpha, beta, player_to_win, evaluate_func):
         return min_eval
 
 
-def execute_minimax_move(evaluate_func, depth: int) -> bool:
-    def execute_minimax_move_aux(game: Game):
+def execute_minimax_move(evaluate_func, depth: int) -> State:
+    def execute_minimax_move_aux(state: State):
         best_state = None
 
         alpha = best_eval = -math.inf
         beta = math.inf
-        for mv in game.state.get_available_moves():
-            nstate = game.state.execute_move(mv)
+        for mv in state.get_available_moves():
+            nstate = state.execute_move(mv)
             nstate_eval = minimax(
-                nstate, depth - 1, alpha, beta, game.state.player, evaluate_func
+                nstate, depth - 1, alpha, beta, state.player, evaluate_func
             )
 
             if nstate_eval > best_eval:
                 alpha = best_eval = nstate_eval
                 best_state = nstate
 
-        game.state = best_state
-        return False
+        return best_state
 
     return execute_minimax_move_aux
 

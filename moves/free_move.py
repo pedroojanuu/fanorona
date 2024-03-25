@@ -18,4 +18,5 @@ class FreeMove(MotionMove):
 
     @Move.execute_decorator
     def execute(self, state):
+        state.count += 1
         return super().execute(state)

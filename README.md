@@ -14,7 +14,7 @@ O jogo requer a instalação das bibliotecas presentes no ficheiro `requirements
 >The game requires the libraries inside the file `requirements.txt`. Their installation can be done through:
 
 
-### Linux / MacOS
+### Linux / macOS
 
 ```bash
 python -m venv .venv        # Create a python virtual environment
@@ -22,7 +22,8 @@ source .venv/bin/activate   # Activate the virtual environment
 pip install -r requirements.txt # Install the required libraries
 ```
 
-### Windows:
+### Windows
+
 ```bash
 python -m venv .venv     # Create a python virtual environment
 .venv\Scripts\activate  # Activate the virtual environment

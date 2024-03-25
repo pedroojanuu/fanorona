@@ -8,9 +8,33 @@ Tópico 2B - Trabalho prático 1 - IA - Grupo A1_22
 
 ## Instalação de dependências
 
-O jogo requer a instalação das bibliotecas pygame e numpy. Tal pode ser feito através do comando:
+O jogo requer a instalação das bibliotecas presentes no ficheiro `requirements.txt`. Tal pode ser feito através dos comandos:
 
-```pip install pygame numpy```
+>## Dependency installation
+>The game requires the libraries inside the file `requirements.txt`. Their installation can be done through:
+
+
+### Linux / MacOS
+
+```bash
+python -m venv .venv        # Create a python virtual environment
+source .venv/bin/activate   # Activate the virtual environment
+pip install -r requirements.txt # Install the required libraries
+```
+
+### Windows:
+```bash
+python -m venv .venv     # Create a python virtual environment
+.venv\Scripts\activate  # Activate the virtual environment
+pip install -r requirements.txt # Install the required libraries
+```
+
+Para desativar o "ambiente", basta correr o comando:
+> To deactivate the environment, just run:
+    
+```bash
+deactivate
+```
 
 ## Execução
 
@@ -20,17 +44,10 @@ Para terminar a qualquer momento, basta premir a tecla ESC ou fechar a janela do
 
 ***
 
-## Dependency installation
+>## Execution
+>- Just run the file ```game.py```, which is in the project's root directory.
+>- To exit at any time, press the ESC key or close pygame window.
 
-The game requires pygame and numpy libraries. Their installation can be done through:
-
-```pip install pygame numpy```
-
-## Execution
-
-Just run the file ```game.py```, which is in the project's root directory.
-
-To exit at any time, press the ESC key or close pygame window.
 
 ***
 

@@ -51,11 +51,15 @@ class State:
             result.append(PassMove())
         return result
 
-    def execute_move(self, move: Move) -> "State":
+    def execute_move(self, move: Move | None) -> "State":
         """
         Executes a move and returns the new state.
         Assumes the move is valid
         """
+        if move is None:
+            self.finish_turn()
+            return self
+
         nstate: State = move.execute(self)
         nstate.add_to_log(move)
         # if no possible next move (no more captures), change player

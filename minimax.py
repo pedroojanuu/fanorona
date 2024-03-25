@@ -11,7 +11,7 @@ from player import Player
 from state import State
 
 
-def get_random_move(state: State) -> Move:
+def get_random_move(state: State) -> Move | None:
     moves = state.get_available_moves()
     if moves == []:  # No moves available
         return None
@@ -52,7 +52,7 @@ def minimax(state: State, depth, alpha, beta, player_to_win, evaluate_func):
         return min_eval
 
 
-def get_minimax_move(evaluate_func, depth: int) -> Move:
+def get_minimax_move(evaluate_func, depth: int) -> Move | None:
     def get_minimax_move_aux(state: State) -> Move:
         best_move = None
 
@@ -74,5 +74,6 @@ def get_minimax_move(evaluate_func, depth: int) -> Move:
 
 def execute_minimax_move(evaluate_func, depth: int) -> State:
     def execute_minimax_move_aux(state: State):
-        return state.execute_move(get_minimax_move(evaluate_func, depth)(state))
+        move = get_minimax_move(evaluate_func, depth)(state)
+        return state.execute_move(move)
     return execute_minimax_move_aux

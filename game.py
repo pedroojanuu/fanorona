@@ -15,6 +15,7 @@ from heuristics.center_control_heuristic import CenterControlHeuristic
 from heuristics.approximate_enemy_heuristic import ApproximateEnemyHeuristic
 
 from monte_carlo_tree_search.tree import MonteCarloTree
+from monte_carlo_tree_search.tree_heuristics import MonteCarloTreeHeuristic
 
 
 class WindowState(Enum):
@@ -118,7 +119,7 @@ class Game:
                     ]),
                     weights=np.array([100000, 50, 10, 5]),
                 )
-                # self.white_alg = MonteCarloTreeHeuristic(heuristic=h, boardWidth=10, boardHeight=10, cWhite=2, cBlack=10)
+                self.white_alg = MonteCarloTreeHeuristic(heuristic=h, boardWidth=10, boardHeight=10, cWhite=2, cBlack=10)
         
         self.window_state = WindowState.PLAYING
         return

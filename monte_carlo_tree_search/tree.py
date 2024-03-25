@@ -64,12 +64,12 @@ class MonteCarloTree:
         return best_move
     
     def update_move(self, move_to_exe):
-        if self.currNode == None or self.currNode.children.size == 0:
-            self.state.execute_move(move_to_exe)
-            return
+        if not self.currNode.expanded:
+            self.currNode.expand()
             
         for child, move in self.currNode.children:
             if move == move_to_exe:
+                print("--------------- Update move: ", move_to_exe)
                 self.currNode = child
                 self.state.execute_move(move)
                 return
@@ -91,6 +91,9 @@ def play_simulation(state: State, mcts: MonteCarloTree, no_rollouts=100):
         if state.player == Player.WHITE:
             mcts.train_until(no_rollouts)
             move_to_exe = mcts.get_best_move()
+            if(move_to_exe not in state.get_available_moves()):
+                mcts.currNode.parentNode.state.draw()
+                raise Exception("Invalid move: ", move_to_exe, " in ", state.get_available_moves())
             print("Best move: ", move_to_exe)
         else:
             print("Available moves: ", state.get_available_moves())
@@ -107,6 +110,7 @@ def play_simulation(state: State, mcts: MonteCarloTree, no_rollouts=100):
 
         mcts.update_move(move_to_exe)
         mcts.state.draw()
+        mcts.currNode.state.draw()
         
         if state.check_winner() != Player.EMPTY:
             print("Winner: ", state.check_winner())

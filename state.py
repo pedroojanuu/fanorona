@@ -36,7 +36,7 @@ class State:
             
     
     def execute_move(self, move: Move):
-        if move not in self.board.get_all_moves(self.player) and not self.in_move_log(move):
+        if move not in self.get_available_moves():
             print("Invalid move")
             return
         self.get_board_matrix()[move.row_destination][move.col_destination] = self.get_board_matrix()[move.row_origin][move.col_origin] 

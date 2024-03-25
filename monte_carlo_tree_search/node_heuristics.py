@@ -17,8 +17,7 @@ class MonteCarloNodeHeuristic(MonteCarloNode):
 
         for i in range(len(moves)):
             move = moves[i]
-            new_state = deepcopy(self.state)
-            new_state.execute_move(move)
+            new_state = self.state.execute_move(move)
             self.children[i] = (MonteCarloNodeHeuristic(self.heuristic, self, new_state, self.cWhite, self.cBlack), move)
 
         return random.choice(self.children)[0]

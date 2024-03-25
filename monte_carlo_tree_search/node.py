@@ -65,10 +65,12 @@ class MonteCarloNode:
     def rollout(self):
         state = self.state
         while state.check_winner() == Player.EMPTY:
-            if(state.get_available_moves() == []):
-                state.change_player()
+            available_moves = state.get_available_moves()
+            if(available_moves == []):
+                move = None
             else:
-                state = state.execute_move(random.choice(state.get_available_moves()))
+                move = random.choice(available_moves)
+            state = state.execute_move(move)
         return state.check_winner()
     
     def delete_state(self):

@@ -40,7 +40,7 @@ class MonteCarloTree:
 
     def train_time(self, timeout):
         start = time.time()
-        while time.time() - start < timeout:
+        while time.time() - start < timeout and not all([child.visits != 0 for child, _ in self.currNode.children]):
             self.currNode.one_training_iteration()
 
     def train_until(self, total_iterations):

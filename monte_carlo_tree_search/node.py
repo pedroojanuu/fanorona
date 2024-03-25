@@ -1,5 +1,6 @@
-from import_from_parent import import_from_parent
-import_from_parent()
+if __name__ == 'main':
+    from import_from_parent import import_from_parent
+    import_from_parent()
 
 from player import Player
 from copy import deepcopy

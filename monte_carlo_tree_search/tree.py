@@ -1,7 +1,8 @@
-from import_from_parent import import_from_parent
-import_from_parent()
+if __name__ == '__main__':
+    from import_from_parent import import_from_parent
+    import_from_parent()
 
-from node import MonteCarloNode
+from monte_carlo_tree_search.node import MonteCarloNode
 from state import State
 from player import Player
 import pickle
@@ -118,10 +119,10 @@ def play_simulation(state: State, mcts: MonteCarloTree):
 if __name__ == '__main__':
     start = time.time()
 
-    mcts = MonteCarloTree(5, 3, 2, 10)
+    mcts = MonteCarloTree(3, 3, 2, 10)
     # mcts.train_time(5)
     mcts.print_tree()
-    play_simulation(State(5, 3), mcts)
+    play_simulation(State(3, 3), mcts)
 
     print("Time: ", time.time() - start)
 

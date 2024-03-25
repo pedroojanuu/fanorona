@@ -76,7 +76,6 @@ class MonteCarloTree:
             
         for child, move in self.currNode.children:
             if move == move_to_exe:
-                print("--------------- Update move: ", move_to_exe)
                 self.currNode = child
                 self.state = self.state.execute_move(move_to_exe)
                 return

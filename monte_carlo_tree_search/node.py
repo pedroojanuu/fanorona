@@ -1,5 +1,6 @@
-from import_from_parent import import_from_parent
-import_from_parent()
+if __name__ == 'main':
+    from import_from_parent import import_from_parent
+    import_from_parent()
 
 from player import Player
 from copy import deepcopy
@@ -56,18 +57,17 @@ class MonteCarloNode:
 
         for i in range(len(moves)):
             move = moves[i]
-            new_state = deepcopy(self.state)
-            new_state.execute_move(move)
+            new_state = self.state.execute_move(move)
             self.children[i] = (MonteCarloNode(self, new_state, self.cWhite, self.cBlack), move)
 
         return random.choice(self.children)[0]
     
     def rollout(self):
-        state = deepcopy(self.state)
+        state = self.state
         while state.check_winner() == Player.EMPTY:
             if(state.get_available_moves() == []):
                 print("No moves")
-            state.execute_move(random.choice(state.get_available_moves()))
+            state = state.execute_move(random.choice(state.get_available_moves()))
         return state.check_winner()
     
     def delete_state(self):

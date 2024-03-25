@@ -1,7 +1,8 @@
-from import_from_parent import import_from_parent
-import_from_parent()
+if __name__ == '__main__':
+    from import_from_parent import import_from_parent
+    import_from_parent()
 
-from node import MonteCarloNode
+from monte_carlo_tree_search.node import MonteCarloNode
 from state import State
 from player import Player
 import pickle
@@ -69,13 +70,13 @@ class MonteCarloTree:
     
     def update_move(self, move_to_exe):
         if self.currNode == None or self.currNode.children.size == 0:
-            self.state.execute_move(move_to_exe)
+            self.state = self.state.execute_move(move_to_exe)
             return
             
         for child, move in self.currNode.children:
             if move == move_to_exe:
                 self.currNode = child
-                self.state.execute_move(move)
+                self.state = self.state.execute_move(move_to_exe)
                 return
             
         print("Player: ", self.state.player)
@@ -105,7 +106,7 @@ def play_simulation(state: State, mcts: MonteCarloTree):
         print('-'*50)
         print()
 
-        state.execute_move(move_to_exe)
+        state = state.execute_move(move_to_exe)
         state.draw()
 
         mcts.update_move(move_to_exe)
@@ -118,10 +119,10 @@ def play_simulation(state: State, mcts: MonteCarloTree):
 if __name__ == '__main__':
     start = time.time()
 
-    mcts = MonteCarloTree(5, 3, 2, 10)
+    mcts = MonteCarloTree(5, 5, 2, 10)
     # mcts.train_time(5)
     mcts.print_tree()
-    play_simulation(State(5, 3), mcts)
+    play_simulation(State(5, 5), mcts)
 
     print("Time: ", time.time() - start)
 

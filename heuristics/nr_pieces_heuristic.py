@@ -11,7 +11,16 @@ from board import Player
 class NrPiecesHeuristic(Heuristic):
     def evaluate_board(self, state, player_to_win):
         adversary = Player.opponent_player(player_to_win)
-        return len(state.board.get_pieces(player_to_win)) - len(state.board.get_pieces(adversary))
+        my_num_pieces = len(state.board.get_pieces(player_to_win))
+        enemy_num_pieces = len(state.board.get_pieces(adversary))
+
+        max_num_pieces = max(my_num_pieces, enemy_num_pieces)
+        min_num_pieces = min(my_num_pieces, enemy_num_pieces)
+
+        if min_num_pieces == 0:
+            return (my_num_pieces - enemy_num_pieces) * 1000000
+
+        return (my_num_pieces - enemy_num_pieces) * max_num_pieces / min_num_pieces
 
 def test_nr_pieces_heuristic():
     s = State()

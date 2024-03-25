@@ -27,6 +27,7 @@ class AdjacentPiecesHeuristic(Heuristic):
         max_adjacent = 0
 
         for r, c in ADJACENT_RIGHT:
+            adjacent = 0
             for row, col in pieces:
                 if visited[row][col]:
                     continue

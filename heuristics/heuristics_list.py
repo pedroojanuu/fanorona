@@ -3,13 +3,13 @@ if __name__ == "__main__":
     import sys
     sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from heuristics.heuristic import Heuristic
 from state import State, Player
 from board import Board
 from player import Player
 import numpy as np
 from enum import Enum
 
+from heuristics.heuristic import Heuristic
 from heuristics.groups_heuristic import GroupsHeuristic, test_groups_heuristic
 from heuristics.center_control_heuristic import CenterControlHeuristic, test_center_control_heuristic
 from heuristics.win_heuristic import WinHeuristic, test_win_heuristic
@@ -19,13 +19,12 @@ from heuristics.nr_pieces_heuristic import NrPiecesHeuristic, test_nr_pieces_heu
 
 class HeuristicsList(Heuristic):
     def __init__(self, heuristics, weights):
-        self.heuristics = heuristics
-        self.weights = weights
+        self.heuristics : list[Heuristic]   = heuristics
+        self.weights    : list[int]         = weights
 
     def evaluate_board(self, state, player_to_win):
         map_func = lambda h, w: h.evaluate_board(state, player_to_win) * w
         map_list = np.vectorize(map_func)(self.heuristics, self.weights)
-        print(map_list)
         return sum(map_list)
 
 

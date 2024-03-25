@@ -1,6 +1,7 @@
 from tree import MonteCarloTree, play_simulation
 from node_heuristics import MonteCarloNodeHeuristic
 from state import State
+from player import Player
 import time
 
 from heuristics.heuristics_list import HeuristicsList
@@ -16,6 +17,13 @@ class MonteCarloTreeHeuristic(MonteCarloTree):
         super().__init__(boardWidth, boardHeight, cWhite, cBlack)
         self.root = MonteCarloNodeHeuristic(heuristic, None, State(boardWidth, boardHeight), cWhite, cBlack)
         self.currNode = self.root
+    
+    @classmethod
+    def from_player(self, heuristic, boardWidth, boardHeight, player):
+        if player == Player.WHITE:
+            return MonteCarloTreeHeuristic(heuristic, boardWidth, boardHeight, 2, 10)
+        else:
+            return MonteCarloTreeHeuristic(heuristic, boardWidth, boardHeight, 10, 2)
 
     def train_until(self, total_iterations):
         while self.currNode.visits < total_iterations:

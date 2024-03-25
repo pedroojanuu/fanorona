@@ -16,6 +16,13 @@ class MonteCarloTree:
         self.state = State(boardWidth, boardHeight)
         self.root = MonteCarloNode(None, State(boardWidth, boardHeight), cWhite, cBlack)
         self.currNode = self.root
+
+    @classmethod
+    def from_player(self, boardWidth, boardHeight, player):
+        if player == Player.WHITE:
+            return MonteCarloTree(boardWidth, boardHeight, 2, 10)
+        else:
+            return MonteCarloTree(boardWidth, boardHeight, 10, 2)
     
     def save_to_disk(self, path):
         with open(path, 'wb') as file:
@@ -119,7 +126,7 @@ def play_simulation(state: State, mcts: MonteCarloTree, no_rollouts=100):
 if __name__ == '__main__':
     start = time.time()
 
-    mcts = MonteCarloTree(5, 5, 2, 10)
+    mcts = MonteCarloTree.from_player(5, 5, Player.WHITE)
     # mcts.train_time(5)
     mcts.print_tree()
     play_simulation(State(5, 5), mcts)

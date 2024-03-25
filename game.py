@@ -108,7 +108,7 @@ class Game:
             elif self.white_mode == PlayerModes.MINIMAX_CENTER_CONTROL:
                 self.white_alg = minimax.get_minimax_move(CenterControlHeuristic().evaluate_board, 4)
             elif self.white_mode == PlayerModes.MCTS_QUICK or self.white_mode == PlayerModes.MCTS_BETTER:
-                self.white_alg = MonteCarloTree(self.width, self.height, 2, 10) # preto colocar 10-2
+                self.white_alg = MonteCarloTree.from_player(self.width, self.height, Player.WHITE)
             elif self.white_mode == PlayerModes.MCTS_HEURISTICS:
                 h = HeuristicsList(
                     heuristics=np.array([
@@ -119,7 +119,7 @@ class Game:
                     ]),
                     weights=np.array([100000, 50, 10, 5]),
                 )
-                self.white_alg = MonteCarloTreeHeuristic(heuristic=h, boardWidth=10, boardHeight=10, cWhite=2, cBlack=10)
+                self.white_alg = MonteCarloTreeHeuristic.from_player(h, self.width, self.height, Player.WHITE)
         
         self.window_state = WindowState.PLAYING
         return

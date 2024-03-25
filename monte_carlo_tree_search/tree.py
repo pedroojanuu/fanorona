@@ -41,7 +41,7 @@ class MonteCarloTree:
 
     def train_time(self, timeout):
         start = time.time()
-        while time.time() - start < timeout:
+        while time.time() - start < timeout and not all([child.visits != 0 for child, _ in self.currNode.children]):
             self.currNode.one_training_iteration()
 
     def train_until(self, total_iterations):
@@ -49,10 +49,6 @@ class MonteCarloTree:
             self.currNode.one_training_iteration()
         
     def get_best_move(self):
-        if self.currNode == None or self.currNode.children.size == 0:
-            print("Random move")
-            return random.choice(self.state.get_available_moves())
-        
         best_move = None
         best_score = float("-inf")
         found = False
@@ -68,18 +64,19 @@ class MonteCarloTree:
         return best_move
     
     def update_move(self, move_to_exe):
-        if self.currNode == None or self.currNode.children.size == 0:
-            self.state = self.state.execute_move(move_to_exe)
-            return
+        if not self.currNode.expanded:
+            self.currNode.expand()
             
         for child, move in self.currNode.children:
             if move == move_to_exe:
+                print("--------------- Update move: ", move_to_exe)
                 self.currNode = child
                 self.state = self.state.execute_move(move_to_exe)
                 return
             
         print("Player: ", self.state.player)
         print("Children: ", self.currNode.children)
+        self.currNode.state.draw()
         raise Exception("Move not found: ", move_to_exe, " in children: ", self.currNode.children)
     
     def reset_game(self):
@@ -87,13 +84,16 @@ class MonteCarloTree:
         self.currNode = self.root
     
 
-def play_simulation(state: State, mcts: MonteCarloTree):
+def play_simulation(state: State, mcts: MonteCarloTree, no_rollouts=100):
     state.draw()
 
-    for i in range(50):
+    while True:
         if state.player == Player.WHITE:
-            mcts.train_until(100)
+            mcts.train_until(no_rollouts)
             move_to_exe = mcts.get_best_move()
+            if(move_to_exe not in state.get_available_moves()):
+                mcts.currNode.parentNode.state.draw()
+                raise Exception("Invalid move: ", move_to_exe, " in ", state.get_available_moves())
             print("Best move: ", move_to_exe)
         else:
             print("Available moves: ", state.get_available_moves())
@@ -110,6 +110,7 @@ def play_simulation(state: State, mcts: MonteCarloTree):
 
         mcts.update_move(move_to_exe)
         mcts.state.draw()
+        mcts.currNode.state.draw()
         
         if state.check_winner() != Player.EMPTY:
             print("Winner: ", state.check_winner())

@@ -67,7 +67,9 @@ class MonteCarloNode:
         while state.check_winner() == Player.EMPTY:
             if(state.get_available_moves() == []):
                 print("No moves")
-            state = state.execute_move(random.choice(state.get_available_moves()))
+                state.change_player()
+            else:
+                state = state.execute_move(random.choice(state.get_available_moves()))
         return state.check_winner()
     
     def delete_state(self):
@@ -101,4 +103,3 @@ class MonteCarloNode:
             winner = node.rollout()
             # print(" ----------- Rolllout: ", winner)
             node.backpropagate(winner)
-        

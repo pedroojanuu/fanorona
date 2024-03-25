@@ -91,7 +91,7 @@ class Game:
         # TODO
 
         # temp
-        self.white_mode = PlayerModes.MINIMAX_WIN
+        self.white_mode = PlayerModes.MCTS_QUICK
         self.black_mode = PlayerModes.HUMAN
         # temp
 

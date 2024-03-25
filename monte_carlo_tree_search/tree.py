@@ -56,7 +56,6 @@ class MonteCarloTree:
         best_move = None
         best_score = float("-inf")
         found = False
-        print(self.currNode.children)
         for child, move in self.currNode.children:
             if child.visits == 0 and not found:
                 best_move = move

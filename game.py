@@ -196,7 +196,7 @@ class Game:
                 self.game_state = self.game_state.execute_move(move)
                 self.white_alg.update_move(move)
             elif self.white_mode == PlayerModes.MCTS_HEURISTICS:
-                self.white_alg.train_until(1000)
+                self.white_alg.train_time(0.01 * self.width * self.height)
                 move = self.white_alg.get_best_move()
                 self.game_state = self.game_state.execute_move(move)
                 self.white_alg.update_move(move)

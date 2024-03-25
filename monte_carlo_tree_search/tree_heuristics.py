@@ -46,9 +46,9 @@ if __name__ == '__main__':
         weights=np.array([100000, 50, 10, 5]),
     )
 
-    mctsh = MonteCarloTreeHeuristic(heuristic=h, boardWidth=10, boardHeight=10, cWhite=2, cBlack=10)
+    mctsh = MonteCarloTreeHeuristic(heuristic=h, boardWidth=5, boardHeight=5, cWhite=2, cBlack=10)
     # mcts.train_time(5)
-    play_simulation(State(10, 10), mctsh, 50)
+    play_simulation(State(5, 5), mctsh, 200)
 
     print("Time: ", time.time() - start)
 

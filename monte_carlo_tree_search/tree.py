@@ -48,7 +48,7 @@ class MonteCarloTree:
 
     def train_time(self, timeout):
         start = time.time()
-        while time.time() - start < timeout and not all([child.visits != 0 for child, _ in self.currNode.children]):
+        while time.time() - start < timeout or not all([child.visits != 0 for child, _ in self.currNode.children]):
             self.currNode.one_training_iteration()
 
     def train_until(self, total_iterations):
@@ -96,10 +96,9 @@ def play_simulation(state: State, mcts: MonteCarloTree, no_rollouts=100):
 
     while True:
         if state.player == Player.WHITE:
-            mcts.train_until(no_rollouts)
+            mcts.train_time(0.02 * 5 * 5)
             move_to_exe = mcts.get_best_move()
             if(move_to_exe not in state.get_available_moves()):
-                mcts.currNode.parentNode.state.draw()
                 raise Exception("Invalid move: ", move_to_exe, " in ", state.get_available_moves())
             print("Best move: ", move_to_exe)
         else:
@@ -117,7 +116,6 @@ def play_simulation(state: State, mcts: MonteCarloTree, no_rollouts=100):
 
         mcts.update_move(move_to_exe)
         mcts.state.draw()
-        mcts.currNode.state.draw()
         
         if state.check_winner() != Player.EMPTY:
             print("Winner: ", state.check_winner())
@@ -127,6 +125,7 @@ if __name__ == '__main__':
     start = time.time()
 
     mcts = MonteCarloTree.from_player(5, 5, Player.WHITE)
+    mcts.train(1000)
     # mcts.train_time(5)
     mcts.print_tree()
     play_simulation(State(5, 5), mcts)

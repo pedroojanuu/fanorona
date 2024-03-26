@@ -1,5 +1,6 @@
 import numpy as np
 from typing import Callable
+import time
 
 from board import Board
 from player import Player
@@ -75,7 +76,7 @@ class State:
         return Player.EMPTY
 
     def game_over(self):
-        return self.check_winner() != Player.EMPTY
+        return self.check_winner() != Player.EMPTY or self.count >= DRAW_COUNTER_THRESHOLD
 
     def draw(self):
         print("Next Player: ", self.player)
@@ -92,23 +93,29 @@ class State:
         Run the AI players in the game until it is over.
 
         Parameters:
-        - ai_white: A function that represents the AI player for the white side. It takes a "Game" object as input and returns a boolean representing whether it has no moves.
-        - ai_black: A function that represents the AI player for the black side. It takes a "Game" object as input and returns a boolean representing whether it has no moves.
+        - ai_white: A function that represents the AI player for the white side. It takes a "State" object as input and returns the new state after executing its move.
+        - ai_black: A function that represents the AI player for the black side. It takes a "State" object as input and returns the new state after executing its move.
         - log_states: A boolean flag indicating whether to log the game states during the AI player's moves. Default is False.
 
         Returns:
         - The winner of the game.
         """
-        winner = None
-
-        while not self.game_over() and winner is None and self.count < DRAW_COUNTER_THRESHOLD:
-            print(self.get_available_moves())
+        time_white, time_black = 0, 0
+        while not self.game_over():
             if log_states:
+                print()
+                print(self.get_available_moves())
                 self.draw()
             if self.is_white_turn():
+                start = time.time()
                 self = ai_white(self)
+                end = time.time()
+                time_white += end - start
             else:
+                start = time.time()
                 self = ai_black(self)
+                end = time.time()
+                time_black += end - start
 
         if self.count == DRAW_COUNTER_THRESHOLD:
             # if X moves have passed without a capture, the game is a draw
@@ -117,9 +124,9 @@ class State:
         if log_states:
             self.draw()
 
-        if winner is None:
-            winner = self.check_winner()
+        winner = self.check_winner()
 
         if log_states:
             print(f"Winner: {winner}")
-        return winner
+
+        return winner, time_white, time_black

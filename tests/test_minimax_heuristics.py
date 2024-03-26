@@ -21,18 +21,23 @@ from heuristics.approximate_enemy_heuristic import ApproximateEnemyHeuristic
 from minimax import execute_minimax_move, execute_random_move
 
 
-def run_n_times(ai_white, ai_black, nr: int, log_states=True):
+def run_n_times(ai_white, ai_black, nr: int, log_states=False):
     wins = {}
+    time_white, time_black = 0, 0
     for _ in range(nr):
         state = State()
         try:
-            winner = state.run_ais(ai_white, ai_black, log_states=log_states)
+            winner, tm_white, tm_black = state.run_ais(ai_white, ai_black, log_states=log_states)
             wins[winner] = wins.get(winner, 0) + 1
+            time_white += tm_white
+            time_black += tm_black
         except Exception as e:
             print(e)
             state.draw()
             print(state.get_available_moves())
             raise e
+    print("Average time white: ", time_white / nr)
+    print("Average time black: ", time_black / nr)
     return wins
 
 
@@ -153,6 +158,22 @@ def test_pieces_adjacent_groups_vs_random(nr: int):
         nr=nr,
     )
 
+@test
+def test_pieces_approximate_enemy_vs_random(nr: int, weight_pieces: int, weight_enemy: int):
+    test_heuristic(
+        execute_minimax_move(
+            HeuristicsList(
+                [
+                    NrPiecesHeuristic(),
+                    ApproximateEnemyHeuristic(),
+                ],
+                [weight_pieces, weight_enemy],
+            ).evaluate_board,
+            2,
+        ),
+        execute_random_move,
+        nr=nr,
+    )
 
 @test
 def test_different_weights_pieces_adjacent_groups(nr: int):
@@ -235,6 +256,7 @@ def test_best_heuristic2(nr: int):
         ),
         nr=nr,
     )
+
 @test
 def test_best_heuristic3(nr: int):
     test_heuristic(
@@ -266,7 +288,7 @@ def test_best_heuristic3(nr: int):
 
 
 if __name__ == "__main__":
-    nr = 100  # The same for all to allow easy time comparison
+    nr = 1000  # The same for all to allow easy time comparison
     # test_random_vs_random(nr)
 
     # test_random_vs_pieces(nr)
@@ -275,9 +297,12 @@ if __name__ == "__main__":
     # test_win_adjacent_vs_random(nr)
     # test_win_groups_vs_random(nr)
     # test_win_center_vs_random(nr)
+    test_pieces_approximate_enemy_vs_random(nr, 10, 2)
+    test_pieces_approximate_enemy_vs_random(nr, 2, 1)
+
     # test_pieces_adjacent_groups_vs_random(nr)
 
     # test_different_weights_pieces_adjacent_groups(nr)
     # test_best_heuristic(1)
     # test_best_heuristic2(1)
-    test_best_heuristic3(1)
+    # test_best_heuristic3(1)

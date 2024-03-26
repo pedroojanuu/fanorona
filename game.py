@@ -307,6 +307,8 @@ class Game:
             text = self.font.render("Pretas vencem!", True, (0,0,0), (184,59,50))
         elif self.winner == Player.WHITE:
             text = self.font.render("Brancas vencem!", True, (255,255,255), (184,59,50))
+        else:
+            text = self.font.render("Empate!", True, (0,0,0), (184,59,50))
         textRect = text.get_rect()
         textRect.center = (self.width*35, self.height*35)
         self.canvas.blit(text, textRect)

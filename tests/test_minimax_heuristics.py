@@ -284,11 +284,31 @@ def test_best_heuristic3(nr: int):
         nr=nr,
     )
 
+@test
+def test_best_heuristic_pieces_vs_pieces_approx_enemy(nr: int, depth_nr_pieces: int):
+    test_heuristic(
+        execute_minimax_move(
+            HeuristicsList(
+                [
+                    NrPiecesHeuristic(),
+                    ApproximateEnemyHeuristic(),
+                ],
+                [2, 1],
+            ).evaluate_board,
+            4,
+        ),
+        execute_minimax_move(
+            NrPiecesHeuristic().evaluate_board,
+            depth_nr_pieces,
+        ),
+        nr
+    )
+
 
 
 
 if __name__ == "__main__":
-    nr = 1000  # The same for all to allow easy time comparison
+    nr = 100  # The same for all to allow easy time comparison
     # test_random_vs_random(nr)
 
     # test_random_vs_pieces(nr)
@@ -297,8 +317,8 @@ if __name__ == "__main__":
     # test_win_adjacent_vs_random(nr)
     # test_win_groups_vs_random(nr)
     # test_win_center_vs_random(nr)
-    test_pieces_approximate_enemy_vs_random(nr, 10, 2)
-    test_pieces_approximate_enemy_vs_random(nr, 2, 1)
+    test_pieces_approximate_enemy_vs_random(1000, 10, 2)
+    test_pieces_approximate_enemy_vs_random(1000, 2, 1)
 
     # test_pieces_adjacent_groups_vs_random(nr)
 
@@ -306,3 +326,5 @@ if __name__ == "__main__":
     # test_best_heuristic(1)
     # test_best_heuristic2(1)
     # test_best_heuristic3(1)
+    # test_best_heuristic_pieces_vs_pieces_approx_enemy(1, 6)
+    # test_best_heuristic_pieces_vs_pieces_approx_enemy(1, 8)

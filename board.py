@@ -20,13 +20,17 @@ class Board:
 
         halfHeight = (self.height - 1) // 2
         halfWidth = (self.width - 1) // 2
+
+        self.num_pieces = 0
         for row in range(halfHeight):
             for col in range(self.width):
                 self.board[row][col] = Player.BLACK
                 self.board[self.height - 1 - row][col] = Player.WHITE
+                self.num_pieces += 1
 
         if self.height % 2 == 0:
             for col in range(0, halfWidth, 2):
+                self.num_pieces += 2
                 self.board[halfHeight][col] = Player.BLACK
                 self.board[halfHeight + 1][col] = Player.BLACK
 
@@ -34,6 +38,7 @@ class Board:
                 self.board[halfHeight + 1][width - col - 1] = Player.WHITE
 
             for col in range(1, halfWidth, 2):
+                self.num_pieces += 2
                 self.board[halfHeight][col] = Player.WHITE
                 self.board[halfHeight + 1][col] = Player.WHITE
 
@@ -41,9 +46,11 @@ class Board:
                 self.board[halfHeight + 1][width - col - 1] = Player.BLACK
         else:
             for col in range(0, halfWidth, 2):
+                self.num_pieces += 1
                 self.board[halfHeight][col] = Player.BLACK
                 self.board[halfHeight][width - col - 1] = Player.WHITE
             for col in range(1, halfWidth, 2):
+                self.num_pieces += 1
                 self.board[halfHeight][col] = Player.WHITE
                 self.board[halfHeight][width - col - 1] = Player.BLACK
 

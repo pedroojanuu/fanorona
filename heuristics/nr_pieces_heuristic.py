@@ -9,10 +9,10 @@ from state import State
 from board import Player
 
 class NrPiecesHeuristic(Heuristic):
-    def evaluate_board(self, state, player_to_win):
+    def evaluate_board(self, state: State, player_to_win: Player):
         adversary = Player.opponent_player(player_to_win)
-        my_num_pieces = len(state.board.get_pieces(player_to_win))
-        enemy_num_pieces = len(state.board.get_pieces(adversary))
+        my_num_pieces = state.get_num_pieces(player_to_win)
+        enemy_num_pieces = state.get_num_pieces(adversary)
 
         max_num_pieces = max(my_num_pieces, enemy_num_pieces)
         min_num_pieces = min(my_num_pieces, enemy_num_pieces)
@@ -30,6 +30,8 @@ def test_nr_pieces_heuristic():
 
     s.get_board_matrix()[0][0:5] = Player.WHITE
     s.get_board_matrix()[1][0:4] = Player.BLACK
+    s.white_pieces_count = 5
+    s.black_pieces_count = 4
 
     print(s.get_board_matrix())
     white_eval = h.evaluate_board(s, Player.WHITE)

@@ -15,6 +15,18 @@ class State:
         self.player = Player.WHITE
         self.move_log = []
         self.count = 0
+        self.white_pieces_count = self.board.num_pieces
+        self.black_pieces_count = self.board.num_pieces
+
+    def decrement_pieces_count(self, player):
+        if player == Player.WHITE:
+            self.white_pieces_count -= 1
+        else:
+            self.black_pieces_count -= 1
+    def get_num_pieces(self, player):
+        if player == Player.WHITE:
+            return self.white_pieces_count
+        return self.black_pieces_count
 
     def get_board_matrix(self):
         return self.board.board

@@ -17,6 +17,10 @@ from heuristics.approximate_enemy_heuristic import ApproximateEnemyHeuristic
 
 from monte_carlo_tree_search.tree import MonteCarloTree
 from monte_carlo_tree_search.tree_heuristics import MonteCarloTreeHeuristic
+from moves.move import Move
+from moves.motion_move import MotionMove
+from moves.pass_move import PassMove
+
 
 WHITE_COLOR = (255, 255, 255)
 BLACK_COLOR = (0, 0, 0)
@@ -211,6 +215,8 @@ class Game:
             self.create_back_button(self.back_to_black_mode_sel),
             self.create_back_button(self.back_to_board_size_sel(from_game_over=True)),
         ]
+        self.selected_moves = []
+
     def back_to_white_mode_sel(self):
         self.white_mode = None
         self.window_state = WindowState.WHITE_MODE_SEL
@@ -462,10 +468,7 @@ class Game:
 
         return
 
-    def board(self):
-        self.canvas.fill(BG_RED_COLOR)  # Background
-        back_button = self.get_back_button()
-
+    def draw_static_board_elements(self):
         # Static elements
         for i in range(self.width):
             pygame.draw.line(
@@ -501,7 +504,24 @@ class Game:
                         (70 * i + 35, 70 * j + 105),
                         2,
                     )
+    def execute_move(self, move: Move):
+        if self.game_state.player == Player.BLACK and ( # TODO: untested
+            self.black_mode == PlayerModes.MCTS_QUICK
+            or self.black_mode == PlayerModes.MCTS_BETTER
+            or self.black_mode == PlayerModes.MCTS_HEURISTICS
+        ):
+            self.white_alg.update_move(move)
+        elif self.game_state.player == Player.WHITE and (
+            self.white_mode == PlayerModes.MCTS_QUICK
+            or self.white_mode == PlayerModes.MCTS_BETTER
+            or self.white_mode == PlayerModes.MCTS_HEURISTICS
+        ):
+            self.black_alg.update_move(move)
 
+        self.selected_moves = []
+        self.game_state = self.game_state.execute_move(move)    # the order matters here
+        self.selected_piece = None
+    def draw_pieces(self):
         for row in range(self.height):
             for col in range(self.width):
                 if self.game_state.get_board_matrix()[row][col] == Player.WHITE:
@@ -512,15 +532,24 @@ class Game:
                     pygame.draw.circle(
                         self.canvas, BLACK_COLOR, (70 * col + 35, 70 * row + 35), 30
                     )
-
+    def draw_selected_piece(self):
         if self.selected_piece != None:
             pygame.draw.circle(
                 self.canvas,
                 (235, 235, 52),
                 (70 * self.selected_piece[1] + 35, 70 * self.selected_piece[0] + 35),
                 30,
-                3,
+                5,
             )
+    def board(self):
+        back_button = self.get_back_button()
+
+        self.canvas.fill(BG_RED_COLOR)  # Background    
+        self.draw_static_board_elements()
+        self.draw_pieces()
+
+        if self.selected_piece != None:
+            self.draw_selected_piece()
 
         if self.game_state.player == Player.BLACK:
             text = self.font.render("Vez das pretas", True, BLACK_COLOR)
@@ -541,7 +570,7 @@ class Game:
         ):
             self.available_moves = self.game_state.get_available_moves()
             for move in self.available_moves:
-                if str(move) != "Pass" and self.selected_piece == (
+                if isinstance(move, MotionMove) and self.selected_piece == (
                     move.row_origin,
                     move.col_origin,
                 ):
@@ -555,9 +584,33 @@ class Game:
                         30,
                         3,
                     )
+            for move in self.selected_moves:
+                row, col = move.get_first_to_kill()
+                pygame.draw.circle(
+                    self.canvas,
+                    (64, 64, 64),   # gray
+                    (70 * col + 35, 70 * row + 35),
+                    30,
+                    0
+                )
+                pygame.draw.circle(
+                    self.canvas,
+                    (255, 0, 0),
+                    (70 * col + 35, 70 * row + 35),
+                    30,
+                    5,
+                )
 
             for event in pygame.event.get():
                 self.check_exit_event(event)
+
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                    move = PassMove()
+                    if move in self.available_moves:
+                        self.execute_move(move)
+                        pygame.display.update()
+                        return
+
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     x, y = pygame.mouse.get_pos()
                     if back_button is not None and back_button.mouse_collision(x, y):
@@ -565,33 +618,33 @@ class Game:
                         return
                     col = x // 70
                     row = y // 70
-                    if self.game_state.board.board[row][col] == self.game_state.player:
+                    if self.game_state.get_board_matrix()[row][col] == self.game_state.player:
                         self.selected_piece = (row, col)
-                    elif self.game_state.board.board[row][col] == Player.EMPTY:
+                        self.selected_moves = []
+                    elif self.game_state.get_board_matrix()[row][col] == Player.EMPTY:
+                        self.selected_moves = []
                         for move in self.available_moves:
-                            if self.selected_piece == (
+                            if isinstance(move, MotionMove) and self.selected_piece == (
                                 move.row_origin,
                                 move.col_origin,
                             ) and (row, col) == (
                                 move.row_destination,
                                 move.col_destination,
                             ):
-                                if self.game_state.player == Player.BLACK and (
-                                    self.black_mode == PlayerModes.MCTS_QUICK
-                                    or self.black_mode == PlayerModes.MCTS_BETTER
-                                    or self.black_mode == PlayerModes.MCTS_HEURISTICS
-                                ):
-                                    self.white_alg.update_move(move)
-                                elif self.game_state.player == Player.WHITE and (
-                                    self.white_mode == PlayerModes.MCTS_QUICK
-                                    or self.white_mode == PlayerModes.MCTS_BETTER
-                                    or self.white_mode == PlayerModes.MCTS_HEURISTICS
-                                ):
-                                    self.black_alg.update_move(move)
-                                self.game_state = self.game_state.execute_move(move)
-                                self.selected_piece = None
+                                self.selected_moves.append(move)
+
+                        if len(self.selected_moves) == 1:
+                            self.execute_move(self.selected_moves[0])
+                            pygame.display.update()
+                            return
+                    else:
+                        for move in self.selected_moves:
+                            if (row, col) == move.get_first_to_kill():
+                                self.execute_move(move)
+                                self.selected_moves = []
                                 pygame.display.update()
                                 return
+
         elif self.game_state.player == Player.WHITE:
             move = None
             if (

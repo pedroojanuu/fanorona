@@ -43,6 +43,8 @@ def play_one_game(state: State, mcts1: MonteCarloTree, no_rollouts1, mcts2: Mont
         mcts2.update_move(move_to_exe)
         return state.execute_move(move_to_exe)
     
+    print("Starting game")
+    
     return state.run_ais(ai_white, ai_black)
 
 def play_n_games(boardWidth, boardHeight, mcts1: MonteCarloTree, no_rollouts1, mcts2: MonteCarloTree, no_rollouts2, nr: int):
@@ -65,18 +67,20 @@ def play_n_games(boardWidth, boardHeight, mcts1: MonteCarloTree, no_rollouts1, m
 
 @test
 def test_quick_vs_better(nr: int):
-    boardWidth = 5
+    print("Quick vs Better")
+    boardWidth = 9
     boardHeight = 5
     mcts1 = MonteCarloTree.from_player(boardWidth, boardHeight, Player.WHITE)
     mcts2 = MonteCarloTree.from_player(boardWidth, boardHeight, Player.BLACK)
-    wins, time1, time2 = play_n_games(boardWidth, boardHeight, mcts1, 1000, mcts2, 100, nr)
+    wins, time1, time2 = play_n_games(boardWidth, boardHeight, mcts1, 100, mcts2, 1000, nr)
     print(wins)
     print(f"Time for quick: {time1}")
     print(f"Time for better: {time2}")
 
 @test
 def test_quick_vs_heuristic(nr: int):
-    boardWidth = 5
+    print("Quick vs Heuristic")
+    boardWidth = 9
     boardHeight = 5
     h = HeuristicsList(
         heuristics=np.array([
@@ -97,7 +101,8 @@ def test_quick_vs_heuristic(nr: int):
 
 @test
 def test_better_vs_heuristic(nr: int):
-    boardWidth = 5
+    print("Better vs Heuristic")
+    boardWidth = 9
     boardHeight = 5
     h = HeuristicsList(
         heuristics=np.array([
@@ -117,7 +122,7 @@ def test_better_vs_heuristic(nr: int):
     print(f"Time for better: {time2}")
 
 if __name__ == "__main__":
-    nr = 100  # The same for all to allow easy time comparison
+    nr = 20  # The same for all to allow easy time comparison
     test_quick_vs_better(nr)
     test_quick_vs_heuristic(nr)
     test_better_vs_heuristic(nr)

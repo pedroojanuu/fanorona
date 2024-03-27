@@ -17,10 +17,17 @@ class WithdrawalMove(MotionMove):
     def allows_multiple_moves(self) -> bool:
         return True
 
+    def get_first_to_kill(self) -> tuple[int, int]:
+        rdir, cdir = self.get_directions()
+        return self.row_origin + rdir, self.col_origin + cdir
+
+    def get_directions(self):
+        return (self.row_origin - self.row_destination, self.col_origin - self.col_destination)
+
     @Move.execute_decorator
     def execute(self, state):
         state = super().execute(state)
-        rdir, cdir = (self.row_origin - self.row_destination, self.col_origin - self.col_destination)
+        rdir, cdir = self.get_directions()
 
         opponent = Player.opponent_player(state.player)
 

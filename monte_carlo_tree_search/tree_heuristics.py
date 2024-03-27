@@ -21,6 +21,7 @@ class MonteCarloTreeHeuristic(MonteCarloTree):
         super().__init__(boardWidth, boardHeight, cWhite, cBlack)
         self.root = MonteCarloNodeHeuristic(heuristic, None, State(boardWidth, boardHeight), cWhite, cBlack)
         self.currNode = self.root
+        self.heuristic = heuristic
     
     @classmethod
     def from_player(self, heuristic, boardWidth, boardHeight, player):
@@ -34,7 +35,9 @@ class MonteCarloTreeHeuristic(MonteCarloTree):
             self.currNode.one_training_iteration()
 
     def reset_game(self):
-        self = MonteCarloTreeHeuristic(self.root.heuristic, self.boardWidth, self.boardHeight, self.cWhite, self.cBlack)
+        self.state = State(self.boardWidth, self.boardHeight)
+        self.root = MonteCarloNodeHeuristic(self.heuristic, None, State(self.boardWidth, self.boardHeight), self.cWhite, self.cBlack)
+        self.currNode = self.root
 
 if __name__ == '__main__':
     start = time.time()

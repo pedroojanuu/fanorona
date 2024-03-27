@@ -16,6 +16,8 @@ class MonteCarloTree:
         self.state = State(boardWidth, boardHeight)
         self.root = MonteCarloNode(None, State(boardWidth, boardHeight), cWhite, cBlack)
         self.currNode = self.root
+        self.cWhite = cWhite
+        self.cBlack = cBlack
 
     @classmethod
     def from_player(self, boardWidth, boardHeight, player):

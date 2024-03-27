@@ -51,70 +51,70 @@ def test_mcts_vs_minimax(
 
     for _ in range(nr):
         state = State(width, height)
-        mcts.reset_game()
-        try:
-            while not state.game_over():
-                if log_states:
-                    state.draw()
-                if state.is_white_turn():
-                    if mcts_is_white:
-                        start = time.time()
-
-                        mcts.train_until(mcts_limit)
-                        move = mcts.get_best_move()
-                        mcts.update_move(move)
-                        state = state.execute_move(move)
-
-                        end = time.time()
-                        time_mcts += end - start
-                    else:
-                        start = time.time()
-
-                        move = minimax(state)
-                        state = state.execute_move(move)
-                        mcts.update_move(move)
-
-                        end = time.time()
-                        time_minimax += end - start
-                else:
-                    if mcts_is_white:
-                        start = time.time()
-
-                        move = minimax(state)
-                        state = state.execute_move(move)
-                        mcts.update_move(move)
-
-                        end = time.time()
-                        time_minimax += end - start
-                    else:
-                        start = time.time()
-
-                        mcts.train_until(mcts_limit)
-                        move = mcts.get_best_move(state)
-                        mcts.update_move(move)
-                        state = state.execute_move(move)
-
-                        end = time.time()
-                        time_mcts += end - start
-
-            if state.count == DRAW_COUNTER_THRESHOLD:
-                # if X moves have passed without a capture, the game is a draw
-                print(f"Draw by {DRAW_COUNTER_THRESHOLD} moves rule (no captures)")
-
+        mcts = MonteCarloTree(width, height, 2, 10)  # white: 2, 10; black: 10, 2
+        # try:
+        while not state.game_over():
             if log_states:
                 state.draw()
+            if state.is_white_turn():
+                if mcts_is_white:
+                    start = time.time()
 
-            winner = state.check_winner()
+                    mcts.train_until(mcts_limit)
+                    move = mcts.get_best_move()
+                    mcts.update_move(move)
+                    state = state.execute_move(move)
 
-            if log_states:
-                print(f"Winner: {winner}")
+                    end = time.time()
+                    time_mcts += end - start
+                else:
+                    start = time.time()
 
-            wins[winner] = wins.get(winner, 0) + 1
-        except Exception as e:
-            print(e)
+                    move = minimax(state)
+                    state = state.execute_move(move)
+                    mcts.update_move(move)
+
+                    end = time.time()
+                    time_minimax += end - start
+            else:
+                if mcts_is_white:
+                    start = time.time()
+
+                    move = minimax(state)
+                    state = state.execute_move(move)
+                    mcts.update_move(move)
+
+                    end = time.time()
+                    time_minimax += end - start
+                else:
+                    start = time.time()
+
+                    mcts.train_until(mcts_limit)
+                    move = mcts.get_best_move()
+                    mcts.update_move(move)
+                    state = state.execute_move(move)
+
+                    end = time.time()
+                    time_mcts += end - start
+
+        if state.count == DRAW_COUNTER_THRESHOLD:
+            # if X moves have passed without a capture, the game is a draw
+            print(f"Draw by {DRAW_COUNTER_THRESHOLD} moves rule (no captures)")
+
+        if log_states:
             state.draw()
-            print(state.get_available_moves())
-            raise e
+
+        winner = state.check_winner()
+
+        if log_states:
+            print(f"Winner: {winner}")
+
+        wins[winner] = wins.get(winner, 0) + 1
+        # except Exception as e:
+        #     print(e)
+        #     state.draw()
+        #     print(state.get_available_moves())
+        #     raise e
     return wins
 
 
@@ -122,7 +122,7 @@ def test_nr_pieces_vs_mcts_quick():
     minimax = get_minimax_move(NrPiecesHeuristic().evaluate_board, 2)
     width, height = 9, 5
     mcts = MonteCarloTree(width, height, 2, 10)  # white: 2, 10; black: 10, 2
-    nr = 1
+    nr = 100
     test_mcts_vs_minimax(
         minimax,
         mcts,

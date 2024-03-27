@@ -56,6 +56,10 @@ class MonteCarloTree:
             self.currNode.one_training_iteration()
         
     def get_best_move(self):
+        if not self.currNode.expanded:
+            print("Warning: Tree not trained enough to get best move. Returning random move.")
+            return random.choice(self.state.get_available_moves())
+        
         if(self.currNode.children[0][0].player == self.currNode.player):
             return max(self.currNode.children, key=lambda x: x[0].total/x[0].visits if x[0].visits != 0 else float("-inf"))[1]
         else:
@@ -75,11 +79,11 @@ class MonteCarloTree:
         print("Player inside mcts: ", self.state.player)
         print("Children: ", self.currNode.children)
         print("State inside mcts:")
-        self.currNode.state.draw()
         raise Exception("Move not found: ", move_to_exe, " in children: ", self.currNode.children)
     
     def reset_game(self):
-        self.state = State(self.boardWidth, self.boardHeight)
+        self.state = State(boardWidth, boardHeight)
+        self.root = MonteCarloNode(None, State(boardWidth, boardHeight), cWhite, cBlack)
         self.currNode = self.root
     
 

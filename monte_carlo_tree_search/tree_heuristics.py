@@ -33,6 +33,9 @@ class MonteCarloTreeHeuristic(MonteCarloTree):
         while self.currNode.visits < total_iterations:
             self.currNode.one_training_iteration()
 
+    def reset_game(self):
+        self = MonteCarloTreeHeuristic(self.root.heuristic, self.boardWidth, self.boardHeight, self.cWhite, self.cBlack)
+
 if __name__ == '__main__':
     start = time.time()
 

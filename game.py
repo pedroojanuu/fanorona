@@ -726,31 +726,27 @@ class Game:
         else:
             return "Empate!", BLACK_COLOR
 
+    def draw_text(self, x, y, text, color):
+        text = self.font.render(text, True, BLACK_COLOR)
+        textRect = text.get_rect(center=(x, y))
+        self.canvas.blit(text, textRect)
+
     def game_over(self):
         self.canvas.fill(BG_RED_COLOR)  # Background
 
         color = None
         text, color = self.get_winner_text()
-        text = self.font.render(text, True, color)
+        self.draw_text(self.width * 35, self.height * 35, text, color)
 
-        textRect = text.get_rect(center=(self.width * 35, self.height * 35))
-        self.canvas.blit(text, textRect)
-
-        text = self.font.render("Obrigado por jogar Fanorona!", True, color)
-        textRect = text.get_rect(center=(self.width * 35, self.height * 35 + 30))
-        self.canvas.blit(text, textRect)
-
-        text = self.font.render(
-            "Félix Martins, Pedro Lima e Pedro Januário", True, color
-        )
-        textRect = text.get_rect(center=(self.width * 35, self.height * 35 + 50))
-        self.canvas.blit(text, textRect)
-
-        text = self.font.render(
-            "Pressione ESC ou feche a janela para sair", True, color
-        )
-        textRect = text.get_rect(center=(self.width * 35, self.height * 35 + 90))
-        self.canvas.blit(text, textRect)
+        textList = [
+            "Obrigado por jogar Fanorona!",
+            "Félix Martins, Pedro Lima e Pedro Januário",
+            "Pressione ESC ou feche a janela para sair",
+            "Para jogar novamente, clique em voltar",
+        ]
+        height_offsets = [20, 50, 90, 110]
+        for text, offset in zip(textList, height_offsets):
+            self.draw_text(self.width * 35, self.height * 35 + offset, text, color)
 
         back_button = self.get_back_button()
         if back_button is not None:

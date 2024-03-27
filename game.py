@@ -21,9 +21,15 @@ from moves.move import Move
 from moves.motion_move import MotionMove
 from moves.pass_move import PassMove
 
+from button import Button
+
 
 WHITE_COLOR = (255, 255, 255)
 BLACK_COLOR = (0, 0, 0)
+GREEN_COLOR = (0, 255, 0)
+GRAY_COLOR = (64, 64, 64)
+YELLOW_COLOR = (235, 235, 52)
+STRONG_RED_COLOR = (255, 0, 0)
 BG_RED_COLOR = (184, 59, 50)
 
 MIN_SIZE, MAX_SIZE = 5, 10
@@ -56,75 +62,13 @@ class PlayerModes(Enum):
             "Minimax (Nr. Peças)",
             "Minimax (Peças Adjacentes)",
             "Minimax (Grupos)",
-            "Minimax (Aproximação ao Inimigo)",
             "Minimax (Controlo do Centro)",
+            "Minimax (Aproximação ao Inimigo)",
             "MCTS (Rápido)",
             "MCTS (Melhor)",
             "MCTS (Heurísticas)",
         ]
         return arr[self.value]
-
-
-class Text:
-    def __init__(
-        self,
-        text: str,
-        x: int,
-        y: int,
-        color: tuple[int, int, int],
-        font: pygame.font.Font,
-        canvas: pygame.Surface,
-    ):
-        self.text = font.render(text, True, color)
-        self.textRect = text.get_rect(center=(x, y))
-
-    def draw(self, canvas: pygame.Surface):
-        canvas.blit(self.text, self.textRect)
-
-
-class Button:
-    RECT_PADDING = 10
-    RECT_BORDER_RADIUS = 4
-
-    def __init__(
-        self,
-        x: int,
-        y: int,
-        text: str,
-        canvas: pygame.Surface,
-        font: pygame.font.Font,
-        textColor: tuple[int, int, int],
-        bgColor: tuple[int, int, int],
-        action=None,
-        width=None,
-        height=None,
-    ):
-        self.text = font.render(text, True, textColor)
-        self.canvas = canvas
-        self.textRect = self.text.get_rect(center=(x, y))
-        self.bgColor = bgColor
-
-        if width is None:
-            width = self.textRect.width
-
-        if height is None:
-            height = self.textRect.height
-        
-        paddingWidth = width - self.textRect.width + self.RECT_PADDING
-        paddingHeight = height - self.textRect.height + self.RECT_PADDING
-
-        self.paddingRect = self.textRect.inflate(paddingWidth, paddingHeight)
-        self.action = action
-
-    def draw(self):
-        if self.bgColor is not None:
-            pygame.draw.rect(
-                self.canvas, self.bgColor, self.paddingRect, 0, self.RECT_BORDER_RADIUS
-            )
-        self.canvas.blit(self.text, self.textRect)
-
-    def mouse_collision(self, x, y):
-        return self.paddingRect.collidepoint(x, y)
 
 
 class Game:
@@ -137,15 +81,20 @@ class Game:
 
     @staticmethod
     def get_canvas_height(height):
-        return height * 70 + 15
+        return height * 70 + 40
 
     def get_default_canvas_width(self):
         return self.get_canvas_width(self.DEFAULT_WIDTH)
+
     def get_default_canvas_height(self):
         return self.get_canvas_height(self.DEFAULT_HEIGHT)
 
     def __init__(self):
         pygame.init()
+
+        # allow keystroke repeats: press every 50 ms after waiting 200 ms
+        pygame.key.set_repeat(200, 100)
+
         self.change_canvas_size(self.DEFAULT_WIDTH, self.DEFAULT_HEIGHT)
         self.canvas.fill(BG_RED_COLOR)  # Background
         self.font = pygame.font.Font("freesansbold.ttf", 15)
@@ -173,7 +122,9 @@ class Game:
         self.size_sel_title = self.font.render(
             "Selecione o tamanho do tabuleiro", True, WHITE_COLOR
         )
-        self.size_sel_title_rect = self.size_sel_title.get_rect(center=(self.get_default_canvas_width() // 2, 15))
+        self.size_sel_title_rect = self.size_sel_title.get_rect(
+            center=(self.get_default_canvas_width() // 2, 15)
+        )
 
         self.size_sel_buttons: list[Button] = []
         for col in range(MIN_SIZE, MAX_SIZE + 1):
@@ -237,6 +188,7 @@ class Game:
             self.width = None
             self.height = None
             self.window_state = WindowState.BOARD_SIZE_SEL
+
         return func
 
     def create_back_button(self, action) -> Button:
@@ -250,6 +202,7 @@ class Game:
             WHITE_COLOR,
             action=action,
         )
+
     def get_back_button(self) -> Button | None:
         match self.window_state:
             case WindowState.WHITE_MODE_SEL:
@@ -272,10 +225,13 @@ class Game:
                 self.game_state = State(self.width, self.height)
                 self.available_moves = self.game_state.get_available_moves()
                 self.selected_piece = None
+
         return func
 
     def change_canvas_size(self, width, height):
-        self.canvas = pygame.display.set_mode((width * 70, height * 70 + 15))
+        self.canvas = pygame.display.set_mode(
+            (self.get_canvas_width(width), self.get_canvas_height(height))
+        )
 
     def size_sel_button_action(self, col, row):
         def func():
@@ -320,31 +276,33 @@ class Game:
 
         pygame.display.update()
 
-    def get_mode_sel_text(self):
-        center = (self.DEFAULT_WIDTH * 35, 15)
-        text = None
+    def draw_mode_sel_text(self):
+        textList = []
 
+        size_str = f"Tamanho: {self.widthStr}"
         if self.window_state == WindowState.WHITE_MODE_SEL:
-            text = self.font.render(
-                f"Tamanho: {self.widthStr}. Selecione o modo da equipa branca",
-                True,
-                WHITE_COLOR,
-            )
+            textList += [
+                self.font.render(size_str, True, WHITE_COLOR),
+                self.font.render(
+                    "Selecione o modo da equipa branca", True, WHITE_COLOR
+                ),
+            ]
         elif self.window_state == WindowState.BLACK_MODE_SEL:
-            text = self.font.render(
-                f"Tamanho: {self.widthStr}. Branco: {self.whiteTypeStr}. Selecione o modo da equipa preta",
-                True,
-                BLACK_COLOR,
+            textList += [
+                self.font.render(
+                    size_str + f"   Branco: {self.whiteTypeStr}", True, BLACK_COLOR
+                ),
+                self.font.render("Selecione o modo da equipa preta", True, BLACK_COLOR),
+            ]
+        for i, text in enumerate(textList):
+            textRect = text.get_rect(
+                center=(self.get_default_canvas_width() // 2, 15 + 15 * (i + 1))
             )
-
-        textRect = text.get_rect(center=center)
-        return text, textRect
+            self.canvas.blit(text, textRect)
 
     def mode_sel(self):
         self.canvas.fill(BG_RED_COLOR)  # Background
-
-        text, textRect = self.get_mode_sel_text()
-        self.canvas.blit(text, textRect)
+        self.draw_mode_sel_text()
 
         back_button = self.get_back_button()
         if back_button is not None:
@@ -366,7 +324,10 @@ class Game:
                     back_button.action()
                     return
 
-        if self.white_mode is not None and self.window_state == WindowState.WHITE_MODE_SEL:
+        if (
+            self.white_mode is not None
+            and self.window_state == WindowState.WHITE_MODE_SEL
+        ):
             if self.white_mode == PlayerModes.MINIMAX_WIN:
                 self.white_alg = minimax.get_minimax_move(
                     WinHeuristic().evaluate_board, 4
@@ -415,7 +376,8 @@ class Game:
                 )
             self.window_state = WindowState.BLACK_MODE_SEL
         elif (
-            self.black_mode is not None and self.window_state == WindowState.BLACK_MODE_SEL
+            self.black_mode is not None
+            and self.window_state == WindowState.BLACK_MODE_SEL
         ):
             if self.black_mode == PlayerModes.MINIMAX_WIN:
                 self.black_alg = minimax.get_minimax_move(
@@ -469,7 +431,6 @@ class Game:
         return
 
     def draw_static_board_elements(self):
-        # Static elements
         for i in range(self.width):
             pygame.draw.line(
                 self.canvas,
@@ -504,8 +465,9 @@ class Game:
                         (70 * i + 35, 70 * j + 105),
                         2,
                     )
-    def execute_move(self, move: Move):
-        if self.game_state.player == Player.BLACK and ( # TODO: untested
+
+    def execute_human_move(self, move: Move):
+        if self.game_state.player == Player.BLACK and (  # TODO: untested
             self.black_mode == PlayerModes.MCTS_QUICK
             or self.black_mode == PlayerModes.MCTS_BETTER
             or self.black_mode == PlayerModes.MCTS_HEURISTICS
@@ -519,8 +481,9 @@ class Game:
             self.black_alg.update_move(move)
 
         self.selected_moves = []
-        self.game_state = self.game_state.execute_move(move)    # the order matters here
+        self.game_state = self.game_state.execute_move(move)  # the order matters here
         self.selected_piece = None
+
     def draw_pieces(self):
         for row in range(self.height):
             for col in range(self.width):
@@ -532,31 +495,189 @@ class Game:
                     pygame.draw.circle(
                         self.canvas, BLACK_COLOR, (70 * col + 35, 70 * row + 35), 30
                     )
+
     def draw_selected_piece(self):
         if self.selected_piece != None:
             pygame.draw.circle(
                 self.canvas,
-                (235, 235, 52),
+                YELLOW_COLOR,
                 (70 * self.selected_piece[1] + 35, 70 * self.selected_piece[0] + 35),
                 30,
                 5,
             )
+
+    def handle_human_moves(self):
+        back_button = self.get_back_button()
+        for move in self.available_moves:
+            if isinstance(move, MotionMove) and self.selected_piece == (
+                move.row_origin,
+                move.col_origin,
+            ):
+                pygame.draw.circle(
+                    self.canvas,
+                    GREEN_COLOR,
+                    (
+                        70 * move.col_destination + 35,
+                        70 * move.row_destination + 35,
+                    ),
+                    30,
+                    3,
+                )
+        for move in self.selected_moves:
+            row, col = move.get_first_to_kill()
+            pygame.draw.circle(
+                self.canvas, GRAY_COLOR, (70 * col + 35, 70 * row + 35), 30
+            )
+            pygame.draw.circle(
+                self.canvas,
+                STRONG_RED_COLOR,
+                (70 * col + 35, 70 * row + 35),
+                30,
+                5,
+            )
+
+        for event in pygame.event.get():
+            self.check_exit_event(event)
+
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                passMove = PassMove()
+                if passMove in self.available_moves:
+                    self.execute_human_move(passMove)
+                    pygame.display.update()
+                    return
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                x, y = pygame.mouse.get_pos()
+                if back_button is not None and back_button.mouse_collision(x, y):
+                    back_button.action()
+                    return
+                col = x // 70
+                row = y // 70
+                if (
+                    self.game_state.get_board_matrix()[row][col]
+                    == self.game_state.player
+                ):
+                    self.selected_piece = (row, col)
+                    self.selected_moves = []
+                elif self.game_state.get_board_matrix()[row][col] == Player.EMPTY:
+                    self.selected_moves = []
+                    for move in self.available_moves:
+                        if (
+                            isinstance(move, MotionMove)
+                            and self.selected_piece
+                            == (
+                                move.row_origin,
+                                move.col_origin,
+                            )
+                            and (row, col)
+                            == (
+                                move.row_destination,
+                                move.col_destination,
+                            )
+                        ):
+                            self.selected_moves.append(move)
+
+                    if len(self.selected_moves) == 1:
+                        self.execute_human_move(self.selected_moves[0])
+                        pygame.display.update()
+                        return
+                else:
+                    for move in self.selected_moves:
+                        if (row, col) == move.get_first_to_kill():
+                            self.execute_human_move(move)
+                            self.selected_moves = []
+                            pygame.display.update()
+                            return
+
+    def is_minimax(self, mode):
+        return (
+            mode == PlayerModes.MINIMAX_WIN
+            or mode == PlayerModes.MINIMAX_NR_PIECES
+            or mode == PlayerModes.MINIMAX_ADJACENT_PIECES
+            or mode == PlayerModes.MINIMAX_GROUPS
+            or mode == PlayerModes.MINIMAX_CENTER_CONTROL
+            or mode == PlayerModes.MINIMAX_APPROXIMATE_ENEMY
+        )
+
+    def is_mcts(self, mode):
+        return (
+            mode == PlayerModes.MCTS_QUICK
+            or mode == PlayerModes.MCTS_BETTER
+            or mode == PlayerModes.MCTS_HEURISTICS
+        )
+
+    def train_mcts(self, mode):
+        match mode:
+            case PlayerModes.MCTS_QUICK:
+                self.white_alg.train_until(100)
+            case PlayerModes.MCTS_BETTER:
+                self.white_alg.train_until(10000)
+            case PlayerModes.MCTS_HEURISTICS:
+                self.white_alg.train_time(0.01 * self.width * self.height)
+
+    def get_current_npc(self):
+        if self.game_state.player == Player.WHITE:
+            return self.white_mode, self.white_alg
+        return self.black_mode, self.black_alg
+
+    def get_other_npc(self):
+        if self.game_state.player == Player.WHITE:
+            return self.black_mode, self.black_alg
+        return self.white_mode, self.white_alg
+
+    def get_pass_move_text(self, color):
+        return self.font.render("Pressione Enter para passar a jogada", True, color)
+
+    def get_white_move_text(self):
+        return self.font.render("Vez das brancas", True, WHITE_COLOR)
+
+    def get_black_move_text(self):
+        return self.font.render("Vez das pretas", True, BLACK_COLOR)
+
+    def get_npc_move_text(self, color):
+        return self.font.render("Pressione Enter para continuar", True, color)
+
+    def draw_playing_text(self):
+        textList = []
+        if self.game_state.player == Player.BLACK:
+            if self.black_mode == PlayerModes.HUMAN:
+                textList.append(self.get_black_move_text())
+                if PassMove() in self.available_moves:
+                    textList.append(self.get_pass_move_text(BLACK_COLOR))
+            else:
+                textList += [
+                    self.get_black_move_text(),
+                    self.get_npc_move_text(BLACK_COLOR),
+                ]
+        elif self.game_state.player == Player.WHITE:
+            if self.white_mode == PlayerModes.HUMAN:
+                textList.append(self.get_white_move_text())
+                if PassMove() in self.available_moves:
+                    textList.append(self.get_pass_move_text(WHITE_COLOR))
+            else:
+                textList += [
+                    self.get_white_move_text(),
+                    self.get_npc_move_text(WHITE_COLOR),
+                ]
+
+        for i, text in enumerate(textList):
+            textRect = text.get_rect(
+                center=(self.width * 70 // 2, self.height * 70 + 7 + 15 * i)
+            )
+            self.canvas.blit(text, textRect)
+
     def board(self):
         back_button = self.get_back_button()
 
-        self.canvas.fill(BG_RED_COLOR)  # Background    
+        self.canvas.fill(BG_RED_COLOR)  # Background
         self.draw_static_board_elements()
         self.draw_pieces()
 
         if self.selected_piece != None:
             self.draw_selected_piece()
 
-        if self.game_state.player == Player.BLACK:
-            text = self.font.render("Vez das pretas", True, BLACK_COLOR)
-        elif self.game_state.player == Player.WHITE:
-            text = self.font.render("Vez das brancas", True, WHITE_COLOR)
-        textRect = text.get_rect(center = (100, self.height * 70 + 7))
-        self.canvas.blit(text, textRect)
+        self.available_moves = self.game_state.get_available_moves()
+        self.draw_playing_text()
 
         if back_button is not None:
             back_button.draw()
@@ -568,183 +689,68 @@ class Game:
             self.black_mode == PlayerModes.HUMAN
             and self.game_state.player == Player.BLACK
         ):
-            self.available_moves = self.game_state.get_available_moves()
-            for move in self.available_moves:
-                if isinstance(move, MotionMove) and self.selected_piece == (
-                    move.row_origin,
-                    move.col_origin,
-                ):
-                    pygame.draw.circle(
-                        self.canvas,
-                        (0, 255, 0),
-                        (
-                            70 * move.col_destination + 35,
-                            70 * move.row_destination + 35,
-                        ),
-                        30,
-                        3,
-                    )
-            for move in self.selected_moves:
-                row, col = move.get_first_to_kill()
-                pygame.draw.circle(
-                    self.canvas,
-                    (64, 64, 64),   # gray
-                    (70 * col + 35, 70 * row + 35),
-                    30,
-                    0
-                )
-                pygame.draw.circle(
-                    self.canvas,
-                    (255, 0, 0),
-                    (70 * col + 35, 70 * row + 35),
-                    30,
-                    5,
-                )
+            self.handle_human_moves()
+        else:
+            move = None
+            mode, alg = self.get_current_npc()
+            other_mode, other_alg = self.get_other_npc()
 
             for event in pygame.event.get():
                 self.check_exit_event(event)
-
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-                    move = PassMove()
-                    if move in self.available_moves:
-                        self.execute_move(move)
-                        pygame.display.update()
-                        return
-
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     x, y = pygame.mouse.get_pos()
                     if back_button is not None and back_button.mouse_collision(x, y):
                         back_button.action()
                         return
-                    col = x // 70
-                    row = y // 70
-                    if self.game_state.get_board_matrix()[row][col] == self.game_state.player:
-                        self.selected_piece = (row, col)
-                        self.selected_moves = []
-                    elif self.game_state.get_board_matrix()[row][col] == Player.EMPTY:
-                        self.selected_moves = []
-                        for move in self.available_moves:
-                            if isinstance(move, MotionMove) and self.selected_piece == (
-                                move.row_origin,
-                                move.col_origin,
-                            ) and (row, col) == (
-                                move.row_destination,
-                                move.col_destination,
-                            ):
-                                self.selected_moves.append(move)
 
-                        if len(self.selected_moves) == 1:
-                            self.execute_move(self.selected_moves[0])
-                            pygame.display.update()
-                            return
-                    else:
-                        for move in self.selected_moves:
-                            if (row, col) == move.get_first_to_kill():
-                                self.execute_move(move)
-                                self.selected_moves = []
-                                pygame.display.update()
-                                return
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                    if self.is_minimax(mode):
+                        move = alg(self.game_state)
+                        self.game_state = self.game_state.execute_move(move)
+                    elif self.is_mcts(mode):
+                        self.train_mcts(mode)
+                        move = alg.get_best_move()
+                        self.game_state = self.game_state.execute_move(move)
+                        alg.update_move(move)
 
-        elif self.game_state.player == Player.WHITE:
-            move = None
-            if (
-                self.white_mode == PlayerModes.MINIMAX_WIN
-                or self.white_mode == PlayerModes.MINIMAX_NR_PIECES
-                or self.white_mode == PlayerModes.MINIMAX_ADJACENT_PIECES
-                or self.white_mode == PlayerModes.MINIMAX_GROUPS
-                or self.white_mode == PlayerModes.MINIMAX_CENTER_CONTROL
-            ):
-                sleep(0.5)
-                move = self.white_alg(self.game_state)
-                self.game_state = self.game_state.execute_move(move)
-            elif self.white_mode == PlayerModes.MCTS_QUICK:
-                self.white_alg.train_until(100)
-                move = self.white_alg.get_best_move()
-                self.game_state = self.game_state.execute_move(move)
-                self.white_alg.update_move(move)
-            elif self.white_mode == PlayerModes.MCTS_BETTER:
-                self.white_alg.train_until(10000)
-                move = self.white_alg.get_best_move()
-                self.game_state = self.game_state.execute_move(move)
-                self.white_alg.update_move(move)
-            elif self.white_mode == PlayerModes.MCTS_HEURISTICS:
-                self.white_alg.train_time(0.01 * self.width * self.height)
-                move = self.white_alg.get_best_move()
-                self.game_state = self.game_state.execute_move(move)
-                self.white_alg.update_move(move)
-
-            if (
-                self.black_mode == PlayerModes.MCTS_QUICK
-                or self.black_mode == PlayerModes.MCTS_BETTER
-                or self.black_mode == PlayerModes.MCTS_HEURISTICS
-            ):
-                self.black_alg.update_move(move)
-        elif self.game_state.player == Player.BLACK:
-            move = None
-            if (
-                self.black_mode == PlayerModes.MINIMAX_WIN
-                or self.black_mode == PlayerModes.MINIMAX_NR_PIECES
-                or self.black_mode == PlayerModes.MINIMAX_ADJACENT_PIECES
-                or self.black_mode == PlayerModes.MINIMAX_GROUPS
-                or self.black_mode == PlayerModes.MINIMAX_CENTER_CONTROL
-            ):
-                sleep(0.5)
-                move = self.black_alg(self.game_state)
-                self.game_state = self.game_state.execute_move(move)
-            elif self.black_mode == PlayerModes.MCTS_QUICK:
-                sleep(0.5)
-                self.black_alg.train_until(100)
-                move = self.black_alg.get_best_move()
-                self.game_state = self.game_state.execute_move(move)
-                self.black_alg.update_move(move)
-            elif self.black_mode == PlayerModes.MCTS_BETTER:
-                self.black_alg.train_until(10000)
-                move = self.black_alg.get_best_move()
-                self.game_state = self.game_state.execute_move(move)
-                self.black_alg.update_move(move)
-            elif self.black_mode == PlayerModes.MCTS_HEURISTICS:
-                sleep(0.5)
-                self.black_alg.train_time(0.01 * self.width * self.height)
-                move = self.black_alg.get_best_move()
-                self.game_state = self.game_state.execute_move(move)
-                self.black_alg.update_move(move)
-
-            if (
-                self.white_mode == PlayerModes.MCTS_QUICK
-                or self.white_mode == PlayerModes.MCTS_BETTER
-                or self.white_mode == PlayerModes.MCTS_HEURISTICS
-            ):
-                self.white_alg.update_move(move)
+            if move is not None and self.is_mcts(other_mode):
+                other_alg.update_move(move)
 
         pygame.display.update()
 
+    def get_winner_text(self):
+        if self.winner == Player.BLACK:
+            return "Pretas vencem!", BLACK_COLOR
+        elif self.winner == Player.WHITE:
+            return "Brancas vencem!", WHITE_COLOR
+        else:
+            return "Empate!", BLACK_COLOR
+
     def game_over(self):
         self.canvas.fill(BG_RED_COLOR)  # Background
-        if self.winner == Player.BLACK:
-            text = self.font.render("Pretas vencem!", True, BLACK_COLOR)
-            color = BLACK_COLOR
-        elif self.winner == Player.WHITE:
-            text = self.font.render("Brancas vencem!", True, WHITE_COLOR)
-            color = WHITE_COLOR
-        else:
-            text = self.font.render("Empate!", True, BLACK_COLOR)
-            color = BLACK_COLOR
 
-        textRect = text.get_rect(center = (self.width * 35, self.height * 35))
+        color = None
+        text, color = self.get_winner_text()
+        text = self.font.render(text, True, color)
+
+        textRect = text.get_rect(center=(self.width * 35, self.height * 35))
         self.canvas.blit(text, textRect)
 
         text = self.font.render("Obrigado por jogar Fanorona!", True, color)
-        textRect = text.get_rect(center = (self.width * 35, self.height * 35 + 30))
+        textRect = text.get_rect(center=(self.width * 35, self.height * 35 + 30))
         self.canvas.blit(text, textRect)
 
-        text = self.font.render("Félix Martins, Pedro Lima e Pedro Januário", True, color)
-        textRect = text.get_rect(center = (self.width * 35, self.height * 35 + 50))
+        text = self.font.render(
+            "Félix Martins, Pedro Lima e Pedro Januário", True, color
+        )
+        textRect = text.get_rect(center=(self.width * 35, self.height * 35 + 50))
         self.canvas.blit(text, textRect)
 
-        text = self.font.render("Pressione ESC ou feche a janela para sair", True, color)
-        textRect = text.get_rect(center = (self.width * 35, self.height * 35 + 90))
+        text = self.font.render(
+            "Pressione ESC ou feche a janela para sair", True, color
+        )
+        textRect = text.get_rect(center=(self.width * 35, self.height * 35 + 90))
         self.canvas.blit(text, textRect)
-
 
         back_button = self.get_back_button()
         if back_button is not None:
@@ -759,8 +765,6 @@ class Game:
                 if back_button is not None and back_button.mouse_collision(x, y):
                     back_button.action()
                     return
-
-
 
     def play(self):
         while True:

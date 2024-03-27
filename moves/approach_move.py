@@ -18,6 +18,13 @@ class ApproachMove(MotionMove):
     def allows_multiple_moves(self) -> bool:
         return True
 
+    def get_directions(self) -> tuple[int, int]:
+        return (self.row_destination - self.row_origin, self.col_destination - self.col_origin)
+
+    def get_first_to_kill(self) -> tuple[int, int]:
+        rdir, cdir = self.get_directions()
+        return self.row_destination + rdir, self.col_destination + cdir
+
     @Move.execute_decorator
     def execute(self, state):
         state = super().execute(state)

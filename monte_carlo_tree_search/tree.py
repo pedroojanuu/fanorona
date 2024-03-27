@@ -82,8 +82,8 @@ class MonteCarloTree:
         raise Exception("Move not found: ", move_to_exe, " in children: ", self.currNode.children)
     
     def reset_game(self):
-        self.state = State(boardWidth, boardHeight)
-        self.root = MonteCarloNode(None, State(boardWidth, boardHeight), cWhite, cBlack)
+        self.state = State(self.boardWidth, self.boardHeight)
+        self.root = MonteCarloNode(None, State(self.boardWidth, self.boardHeight), self.cWhite, self.cBlack)
         self.currNode = self.root
     
 

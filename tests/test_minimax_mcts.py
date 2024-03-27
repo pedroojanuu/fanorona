@@ -33,6 +33,25 @@ move -> state (execute_move)
 
 """
 
+heuristicList = [
+    None,
+    NrPiecesHeuristic(),
+    AdjacentPiecesHeuristic(),
+    WinHeuristic(),
+    GroupsHeuristic(),
+    CenterControlHeuristic(),
+    ApproximateEnemyHeuristic(),
+    HeuristicsList(
+        heuristics=np.array([
+            WinHeuristic(),
+            NrPiecesHeuristic(),
+            AdjacentPiecesHeuristic(),
+            GroupsHeuristic(),
+            CenterControlHeuristic(),
+        ]),
+        weights=np.array([100000, 50, 25, 10, 5]),
+    )
+]
 
 @test
 def test_mcts_vs_minimax(

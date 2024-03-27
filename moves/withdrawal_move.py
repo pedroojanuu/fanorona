@@ -22,13 +22,16 @@ class WithdrawalMove(MotionMove):
         state = super().execute(state)
         rdir, cdir = (self.row_origin - self.row_destination, self.col_origin - self.col_destination)
 
+        opponent = Player.opponent_player(state.player)
+
         row_to_kill = self.row_origin
         col_to_kill = self.col_origin
         while True:
             row_to_kill += rdir
             col_to_kill += cdir
-            if state.board.inside_board(row_to_kill, col_to_kill) and state.get_board_matrix()[row_to_kill][col_to_kill] == Player.opponent_player(state.player):
+            if state.board.inside_board(row_to_kill, col_to_kill) and state.get_board_matrix()[row_to_kill][col_to_kill] == opponent:
                 state.get_board_matrix()[row_to_kill][col_to_kill] = Player.EMPTY
+                state.decrement_pieces_count(opponent)
             else:
                 break
         state.count = 0

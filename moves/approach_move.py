@@ -28,15 +28,16 @@ class ApproachMove(MotionMove):
 
         row_to_kill = self.row_destination
         col_to_kill = self.col_destination
+        opponent = Player.opponent_player(state.player)
         while True:
             row_to_kill += rdir
             col_to_kill += cdir
-            if state.board.inside_board(
-                row_to_kill, col_to_kill
-            ) and state.get_board_matrix()[row_to_kill][col_to_kill] == Player.opponent_player(
-                state.player
+            if (
+                state.board.inside_board(row_to_kill, col_to_kill)
+                and state.get_board_matrix()[row_to_kill][col_to_kill] == opponent
             ):
                 state.get_board_matrix()[row_to_kill][col_to_kill] = Player.EMPTY
+                state.decrement_pieces_count(opponent)
             else:
                 break
 

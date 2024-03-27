@@ -3,6 +3,7 @@ import numpy as np
 from state import State
 from player import Player
 from enum import Enum
+from time import sleep
 
 import minimax
 from heuristics.heuristic import Heuristic
@@ -16,7 +17,6 @@ from heuristics.approximate_enemy_heuristic import ApproximateEnemyHeuristic
 
 from monte_carlo_tree_search.tree import MonteCarloTree
 from monte_carlo_tree_search.tree_heuristics import MonteCarloTreeHeuristic
-
 
 class WindowState(Enum):
     BOARD_SIZE_SEL = 0
@@ -32,9 +32,14 @@ class PlayerModes(Enum):
     MINIMAX_ADJACENT_PIECES = 3
     MINIMAX_GROUPS = 4
     MINIMAX_CENTER_CONTROL = 5
-    MCTS_QUICK = 6
-    MCTS_BETTER = 7
-    MCTS_HEURISTICS = 8
+    MINIMAX_APPROXIMATE_ENEMY = 6
+    MCTS_QUICK = 7
+    MCTS_BETTER = 8
+    MCTS_HEURISTICS = 9
+
+    def __str__(self):
+        arr = ['Humano', 'Minimax (Vitória)', 'Minimax (Nr. Peças)', 'Minimax (Peças Adjacentes)', 'Minimax (Grupos)', 'Minimax (Aproximação ao Inimigo)', 'Minimax (Controlo do Centro)', 'MCTS (Rápido)', 'MCTS (Melhor)', 'MCTS (Heurísticas)']
+        return arr[self.value]
 
 class Game:
     def __init__(self):
@@ -64,6 +69,13 @@ class Game:
         self.black_alg = None
 
     def size_sel(self):
+        self.canvas.fill((184, 59, 50)) # Background
+
+        text = self.font.render("Selecione o tamanho do tabuleiro", True, (255,255,255), (184,59,50))
+        textRect = text.get_rect()
+        textRect.center = (175, 15)
+        self.canvas.blit(text, textRect)
+
         for i in range(5, 11):
             for j in range(5, 11):
                 text = self.font.render(f"{i}*{j}", True, (0,0,0), (255,255,255))
@@ -89,14 +101,37 @@ class Game:
         pygame.display.update()
     
     def mode_sel(self):
-        # TODO
+        self.canvas.fill((184, 59, 50)) # Background
 
-        # temp
-        self.white_mode = PlayerModes.MCTS_QUICK
-        self.black_mode = PlayerModes.HUMAN
-        # temp
-
+        text = None
         if self.window_state == WindowState.WHITE_MODE_SEL:
+            text = self.font.render("Modo da equipa branca", True, (255,255,255), (184,59,50))
+        elif self.window_state == WindowState.BLACK_MODE_SEL:
+            text = self.font.render("Modo da equipa preta", True, (0,0,0), (184,59,50))
+        textRect = text.get_rect()
+        textRect.center = (self.width*35, 15)
+        self.canvas.blit(text, textRect)
+
+        for i, mode in enumerate(PlayerModes):
+            text = self.font.render(str(mode), True, (0,0,0), (255,255,255))
+            textRect = text.get_rect()
+            textRect.center = (self.width*35, (i+2)*30)
+            self.canvas.blit(text, textRect)
+        
+        pygame.display.update()
+
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                x, y = pygame.mouse.get_pos()
+                mode = (y-30) // 30
+                if mode < 0 or mode >= len(PlayerModes):
+                    continue
+                if self.window_state == WindowState.WHITE_MODE_SEL:
+                    self.white_mode = PlayerModes(mode)
+                elif self.window_state == WindowState.BLACK_MODE_SEL:
+                    self.black_mode = PlayerModes(mode)
+
+        if self.white_mode != None and self.window_state == WindowState.WHITE_MODE_SEL:
             if self.white_mode == PlayerModes.MINIMAX_WIN:
                 self.white_alg = minimax.get_minimax_move(WinHeuristic().evaluate_board, 4)
             elif self.white_mode == PlayerModes.MINIMAX_NR_PIECES:
@@ -107,6 +142,8 @@ class Game:
                 self.white_alg = minimax.get_minimax_move(GroupsHeuristic().evaluate_board, 4)
             elif self.white_mode == PlayerModes.MINIMAX_CENTER_CONTROL:
                 self.white_alg = minimax.get_minimax_move(CenterControlHeuristic().evaluate_board, 4)
+            elif self.white_mode == PlayerModes.MINIMAX_APPROXIMATE_ENEMY:
+                self.white_alg = minimax.get_minimax_move(ApproximateEnemyHeuristic().evaluate_board, 4)
             elif self.white_mode == PlayerModes.MCTS_QUICK or self.white_mode == PlayerModes.MCTS_BETTER:
                 self.white_alg = MonteCarloTree.from_player(self.width, self.height, Player.WHITE)
             elif self.white_mode == PlayerModes.MCTS_HEURISTICS:
@@ -120,8 +157,34 @@ class Game:
                     weights=np.array([100000, 50, 10, 5]),
                 )
                 self.white_alg = MonteCarloTreeHeuristic.from_player(h, self.width, self.height, Player.WHITE)
-        
-        self.window_state = WindowState.PLAYING
+            self.window_state = WindowState.BLACK_MODE_SEL
+        elif self.black_mode != None and self.window_state == WindowState.BLACK_MODE_SEL:
+            if self.black_mode == PlayerModes.MINIMAX_WIN:
+                self.black_alg = minimax.get_minimax_move(WinHeuristic().evaluate_board, 4)
+            elif self.black_mode == PlayerModes.MINIMAX_NR_PIECES:
+                self.black_alg = minimax.get_minimax_move(NrPiecesHeuristic().evaluate_board, 4)
+            elif self.black_mode == PlayerModes.MINIMAX_ADJACENT_PIECES:
+                self.black_alg = minimax.get_minimax_move(AdjacentPiecesHeuristic().evaluate_board, 4)
+            elif self.black_mode == PlayerModes.MINIMAX_GROUPS:
+                self.black_alg = minimax.get_minimax_move(GroupsHeuristic().evaluate_board, 4)
+            elif self.black_mode == PlayerModes.MINIMAX_CENTER_CONTROL:
+                self.black_alg = minimax.get_minimax_move(CenterControlHeuristic().evaluate_board, 4)
+            elif self.black_mode == PlayerModes.MINIMAX_APPROXIMATE_ENEMY:
+                self.black_alg = minimax.get_minimax_move(ApproximateEnemyHeuristic().evaluate_board, 4)
+            elif self.black_mode == PlayerModes.MCTS_QUICK or self.black_mode == PlayerModes.MCTS_BETTER:
+                self.black_alg = MonteCarloTree.from_player(self.width, self.height, Player.BLACK)
+            elif self.black_mode == PlayerModes.MCTS_HEURISTICS:
+                h = HeuristicsList(
+                    heuristics=np.array([
+                        WinHeuristic(),
+                        NrPiecesHeuristic(),
+                        GroupsHeuristic(),
+                        CenterControlHeuristic(),
+                    ]),
+                    weights=np.array([100000, 50, 10, 5]),
+                )
+                self.black_alg = MonteCarloTreeHeuristic.from_player(h, self.width, self.height, Player.BLACK)
+            self.window_state = WindowState.PLAYING
         return
 
     def board(self):
@@ -158,8 +221,9 @@ class Game:
         self.canvas.blit(text, textRect)
 
         if (self.white_mode == PlayerModes.HUMAN and self.game_state.player == Player.WHITE) or (self.black_mode == PlayerModes.HUMAN and self.game_state.player == Player.BLACK):
+            self.available_moves = self.game_state.get_available_moves()
             for move in self.available_moves:
-                if self.selected_piece == (move.row_origin, move.col_origin):
+                if str(move) != 'Pass' and self.selected_piece == (move.row_origin, move.col_origin):
                     pygame.draw.circle(self.canvas, (0,255,0), (70*move.col_destination+35, 70*move.row_destination+35), 30, 3)
             
             for event in pygame.event.get():
@@ -175,14 +239,18 @@ class Game:
                     elif self.game_state.board.board[row][col] == Player.EMPTY:
                         for move in self.available_moves:
                             if self.selected_piece == (move.row_origin, move.col_origin) and (row, col) == (move.row_destination, move.col_destination):
+                                if self.game_state.player == Player.BLACK and (self.black_mode == PlayerModes.MCTS_QUICK or self.black_mode == PlayerModes.MCTS_BETTER or self.black_mode == PlayerModes.MCTS_HEURISTICS):
+                                    self.white_alg.update_move(move)
+                                elif self.game_state.player == Player.WHITE and (self.white_mode == PlayerModes.MCTS_QUICK or self.white_mode == PlayerModes.MCTS_BETTER or self.white_mode == PlayerModes.MCTS_HEURISTICS):
+                                    self.black_alg.update_move(move)
                                 self.game_state = self.game_state.execute_move(move)
-                                self.available_moves = self.game_state.get_available_moves()
                                 self.selected_piece = None
                                 pygame.display.update()
                                 return
         elif self.game_state.player == Player.WHITE:
             move = None
             if self.white_mode == PlayerModes.MINIMAX_WIN or self.white_mode == PlayerModes.MINIMAX_NR_PIECES or self.white_mode == PlayerModes.MINIMAX_ADJACENT_PIECES or self.white_mode == PlayerModes.MINIMAX_GROUPS or self.white_mode == PlayerModes.MINIMAX_CENTER_CONTROL:
+                sleep(0.5)
                 move = self.white_alg(self.game_state)
                 self.game_state = self.game_state.execute_move(move)
             elif self.white_mode == PlayerModes.MCTS_QUICK:
@@ -198,6 +266,32 @@ class Game:
                 
             if self.black_mode == PlayerModes.MCTS_QUICK or self.black_mode == PlayerModes.MCTS_BETTER or self.black_mode == PlayerModes.MCTS_HEURISTICS:
                 self.black_alg.update_move(move)
+        elif self.game_state.player == Player.BLACK:
+            move = None
+            if self.black_mode == PlayerModes.MINIMAX_WIN or self.black_mode == PlayerModes.MINIMAX_NR_PIECES or self.black_mode == PlayerModes.MINIMAX_ADJACENT_PIECES or self.black_mode == PlayerModes.MINIMAX_GROUPS or self.black_mode == PlayerModes.MINIMAX_CENTER_CONTROL:
+                sleep(0.5)
+                move = self.black_alg(self.game_state)
+                self.game_state = self.game_state.execute_move(move)
+            elif self.black_mode == PlayerModes.MCTS_QUICK:
+                sleep(0.5)
+                self.black_alg.train_until(100)
+                move = self.black_alg.get_best_move()
+                self.game_state = self.game_state.execute_move(move)
+                self.black_alg.update_move(move)
+            elif self.black_mode == PlayerModes.MCTS_BETTER:
+                self.black_alg.train_until(10000)
+                move = self.black_alg.get_best_move()
+                self.game_state = self.game_state.execute_move(move)
+                self.black_alg.update_move(move)
+            elif self.black_mode == PlayerModes.MCTS_HEURISTICS:
+                sleep(0.5)
+                self.black_alg.train_time(0.01 * self.width * self.height)
+                move = self.black_alg.get_best_move()
+                self.game_state = self.game_state.execute_move(move)
+                self.black_alg.update_move(move)
+                
+            if self.white_mode == PlayerModes.MCTS_QUICK or self.white_mode == PlayerModes.MCTS_BETTER or self.white_mode == PlayerModes.MCTS_HEURISTICS:
+                self.white_alg.update_move(move)
 
         pygame.display.update()
     
@@ -208,6 +302,8 @@ class Game:
             text = self.font.render("Pretas vencem!", True, (0,0,0), (184,59,50))
         elif self.winner == Player.WHITE:
             text = self.font.render("Brancas vencem!", True, (255,255,255), (184,59,50))
+        else:
+            text = self.font.render("Empate!", True, (0,0,0), (184,59,50))
         textRect = text.get_rect()
         textRect.center = (self.width*35, self.height*35)
         self.canvas.blit(text, textRect)

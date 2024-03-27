@@ -9,24 +9,21 @@ class ApproximateEnemyHeuristic(Heuristic):
     This heuristic evaluates the board by reducing the distance from my pieces to the enemy pieces
     The heuristic returns the negative sum of the minimum distances for each of my pieces.
 
-    It should never be used alone, but as part of a list of heuristics. And it should always have a relatively low weight.
+    It should never be used alone, but as part of a list of heuristics. And it should always have a relatively lower weight.
     """
     def evaluate_board(self, state, player_to_win):
-        # reduce the distance from my pieces to the enemy pieces
         adversary = Player.opponent_player(player_to_win)
         my_pieces = state.board.get_pieces(player_to_win)
         enemy_pieces = state.board.get_pieces(adversary)
         if len(my_pieces) == 0 or len(enemy_pieces) == 0:
             return 0
 
-        distances = np.sum(np.abs(my_pieces[:, None] - enemy_pieces), axis=2)
+        distances = np.linalg.norm(my_pieces[:, None] - enemy_pieces, axis=2)
+
         min_distances = np.min(distances, axis=1)
 
         # Return the negative sum of the minimum distances for each of my pieces
         return -np.sum(min_distances) / len(my_pieces)
-
-        # Return the negative sum of the minimum distances for each of my pieces
-        # return -np.sum(np.min(distances, axis=1)) / len(my_pieces)
 
  
 def test_approximate_enemy_heuristic():

@@ -72,8 +72,9 @@ class MonteCarloTree:
                 self.state = self.state.execute_move(move_to_exe)
                 return
             
-        print("Player: ", self.state.player)
+        print("Player inside mcts: ", self.state.player)
         print("Children: ", self.currNode.children)
+        print("State inside mcts:")
         self.currNode.state.draw()
         raise Exception("Move not found: ", move_to_exe, " in children: ", self.currNode.children)
     

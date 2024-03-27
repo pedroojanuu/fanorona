@@ -190,13 +190,8 @@ class Game:
                 move = self.white_alg.get_best_move()
                 self.game_state = self.game_state.execute_move(move)
                 self.white_alg.update_move(move)
-            elif self.white_mode == PlayerModes.MCTS_BETTER:
-                self.white_alg.train_until(10000)
-                move = self.white_alg.get_best_move()
-                self.game_state = self.game_state.execute_move(move)
-                self.white_alg.update_move(move)
-            elif self.white_mode == PlayerModes.MCTS_HEURISTICS:
-                self.white_alg.train_time(0.01 * self.width * self.height)
+            elif self.white_mode == PlayerModes.MCTS_BETTER or self.white_mode == PlayerModes.MCTS_HEURISTICS:
+                self.white_alg.train_until(1000)
                 move = self.white_alg.get_best_move()
                 self.game_state = self.game_state.execute_move(move)
                 self.white_alg.update_move(move)

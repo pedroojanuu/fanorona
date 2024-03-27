@@ -1,4 +1,4 @@
-from node import MonteCarloNode
+from monte_carlo_tree_search.node import MonteCarloNode
 from player import Player
 from copy import deepcopy
 

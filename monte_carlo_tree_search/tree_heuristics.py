@@ -2,8 +2,8 @@ if __name__ == '__main__':
     from import_from_parent import import_from_parent
     import_from_parent()
 
-from tree import MonteCarloTree, play_simulation
-from node_heuristics import MonteCarloNodeHeuristic
+from monte_carlo_tree_search.tree import MonteCarloTree, play_simulation
+from monte_carlo_tree_search.node_heuristics import MonteCarloNodeHeuristic
 from state import State
 from player import Player
 import time
@@ -46,9 +46,9 @@ if __name__ == '__main__':
         weights=np.array([100000, 50, 10, 5]),
     )
 
-    mctsh = MonteCarloTreeHeuristic(heuristic=h, boardWidth=5, boardHeight=5, cWhite=2, cBlack=10)
+    mctsh = MonteCarloTreeHeuristic(heuristic=h, boardWidth=10, boardHeight=10, cWhite=2, cBlack=10)
     # mcts.train_time(5)
-    play_simulation(State(5, 5), mctsh, 200)
+    play_simulation(State(10, 10), mctsh, 1000)
 
     print("Time: ", time.time() - start)
 

@@ -22,13 +22,16 @@ class MonteCarloNode:
         self.total = 0
         self.visits = 0
         self.parentNode = parentNode
-        self.player = Player.WHITE
         self.children = np.array([])
         self.state = state
         self.cWhite = cWhite
         self.cBlack = cBlack
         self.game_finished = (state.check_winner() != Player.EMPTY)
         self.expanded = False
+        if(state.player == Player.WHITE):
+            self.player = Player.WHITE
+        else:
+            self.player = Player.BLACK
 
     def add_child(self, child, move):
         self.children.append((child, move))
@@ -44,8 +47,8 @@ class MonteCarloNode:
     def select_child(self):
         if self.children.size == 0:
             raise Exception("No children to select from")
-        return random.choice(all_max(self.children, key=lambda x: x[0].ucb1()))
-    
+        return max(self.children, key=lambda x: x[0].ucb1())
+
     def expand(self):
         self.expanded = True
         moves = self.state.get_available_moves()
@@ -70,8 +73,7 @@ class MonteCarloNode:
         return state.check_winner()
     
     def delete_state(self):
-        # self.state = None
-        pass
+        self.state = None
     
     def backpropagate(self, winner):
         self.visits += 1

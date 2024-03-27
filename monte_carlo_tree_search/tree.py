@@ -56,19 +56,10 @@ class MonteCarloTree:
             self.currNode.one_training_iteration()
         
     def get_best_move(self):
-        best_move = None
-        best_score = float("-inf")
-        found = False
-        for child, move in self.currNode.children:
-            if child.visits == 0 and not found:
-                best_move = move
-                found = True
-            elif child.visits != 0 and child.total / child.visits > best_score:
-                best_score = child.total / child.visits
-                best_move = move
-                found = True
-        
-        return best_move
+        if(self.currNode.children[0][0].player == self.currNode.player):
+            return max(self.currNode.children, key=lambda x: x[0].total/x[0].visits if x[0].visits != 0 else float("-inf"))[1]
+        else:
+            return min(self.currNode.children, key=lambda x: x[0].total/x[0].visits if x[0].visits != 0 else float("inf"))[1]
     
     def update_move(self, move_to_exe):
         if not self.currNode.expanded:
@@ -76,8 +67,8 @@ class MonteCarloTree:
             
         for child, move in self.currNode.children:
             if move == move_to_exe:
-                print("--------------- Update move: ", move_to_exe)
                 self.currNode = child
+                self.currNode.parentNode = None
                 self.state = self.state.execute_move(move_to_exe)
                 return
             
@@ -96,7 +87,8 @@ def play_simulation(state: State, mcts: MonteCarloTree, no_rollouts=100):
 
     while True:
         if state.player == Player.WHITE:
-            mcts.train_time(0.02 * 5 * 5)
+            # mcts.train_time(0.02 * 5 * 5)
+            mcts.train_until(no_rollouts)
             move_to_exe = mcts.get_best_move()
             if(move_to_exe not in state.get_available_moves()):
                 raise Exception("Invalid move: ", move_to_exe, " in ", state.get_available_moves())
@@ -124,11 +116,11 @@ def play_simulation(state: State, mcts: MonteCarloTree, no_rollouts=100):
 if __name__ == '__main__':
     start = time.time()
 
-    mcts = MonteCarloTree.from_player(5, 5, Player.WHITE)
-    mcts.train(1000)
+    mcts = MonteCarloTree.from_player(9, 5, Player.WHITE)
+    # mcts.train(1000)
     # mcts.train_time(5)
     mcts.print_tree()
-    play_simulation(State(5, 5), mcts)
+    play_simulation(State(9, 5), mcts, 1000)
 
     print("Time: ", time.time() - start)
 

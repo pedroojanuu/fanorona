@@ -27,7 +27,8 @@ from button import Button
 WHITE_COLOR = (255, 255, 255)
 BLACK_COLOR = (0, 0, 0)
 GREEN_COLOR = (0, 255, 0)
-GRAY_COLOR = (64, 64, 64)
+GRAY_COLOR_WHITE = (128, 128, 128)
+GRAY_COLOR_BLACK = (64, 64, 64)
 YELLOW_COLOR = (235, 235, 52)
 STRONG_RED_COLOR = (255, 0, 0)
 BG_RED_COLOR = (184, 59, 50)
@@ -50,7 +51,7 @@ class PlayerModes(Enum):
     MINIMAX_DEFENSIVE_EASY = 3
     MINIMAX_DEFENSIVE_HARD = 4
     MINIMAX_AGRESSIVE_EASY = 5
-    MINIMAX_AGRESSIVE_HARD= 6
+    MINIMAX_AGRESSIVE_HARD = 6
     MCTS_QUICK = 7
     MCTS_BETTER = 8
     MCTS_HEURISTICS = 9
@@ -508,9 +509,12 @@ class Game:
                 )
         for move in self.selected_moves:
             row, col = move.get_first_to_kill()
-            pygame.draw.circle(
-                self.canvas, GRAY_COLOR, (70 * col + 35, 70 * row + 35), 30
+            gray = (
+                GRAY_COLOR_WHITE
+                if self.game_state.get_board_matrix()[row][col] == Player.WHITE
+                else GRAY_COLOR_BLACK
             )
+            pygame.draw.circle(self.canvas, gray, (70 * col + 35, 70 * row + 35), 30)
             pygame.draw.circle(
                 self.canvas,
                 STRONG_RED_COLOR,

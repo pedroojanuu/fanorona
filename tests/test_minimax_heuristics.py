@@ -1,7 +1,8 @@
 import sys
 import os
 
-sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 
 import numpy as np
 
@@ -308,7 +309,7 @@ def test_best_heuristic_pieces_vs_pieces_approx_enemy(nr: int, depth_nr_pieces: 
 
 
 if __name__ == "__main__":
-    nr = 100  # The same for all to allow easy time comparison
+    nr = 5000  # The same for all to allow easy time comparison
     # test_random_vs_random(nr)
 
     # test_random_vs_pieces(nr)
@@ -317,14 +318,15 @@ if __name__ == "__main__":
     # test_win_adjacent_vs_random(nr)
     # test_win_groups_vs_random(nr)
     # test_win_center_vs_random(nr)
-    test_pieces_approximate_enemy_vs_random(1000, 10, 2)
-    test_pieces_approximate_enemy_vs_random(1000, 2, 1)
+
+    test_pieces_approximate_enemy_vs_random(nr, 10, 2)
+    test_pieces_approximate_enemy_vs_random(nr, 2, 1)
 
     # test_pieces_adjacent_groups_vs_random(nr)
-
     # test_different_weights_pieces_adjacent_groups(nr)
-    # test_best_heuristic(1)
-    # test_best_heuristic2(1)
-    # test_best_heuristic3(1)
-    # test_best_heuristic_pieces_vs_pieces_approx_enemy(1, 6)
-    # test_best_heuristic_pieces_vs_pieces_approx_enemy(1, 8)
+
+    # test_best_heuristic(20)
+    # test_best_heuristic2(20)
+    # test_best_heuristic3(20)
+    test_best_heuristic_pieces_vs_pieces_approx_enemy(20, 6)
+    test_best_heuristic_pieces_vs_pieces_approx_enemy(10, 8)

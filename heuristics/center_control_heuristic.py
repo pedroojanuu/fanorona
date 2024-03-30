@@ -11,7 +11,7 @@ from board import Player
 
 
 class CenterControlHeuristic(Heuristic):
-    def evaluate_board(self, state, player_to_win):
+    def evaluate_board(self, state: State, player_to_win: Player):
         rowMiddle = state.get_board_matrix().shape[0] // 2
         colMiddle = state.get_board_matrix().shape[1] // 2
         enemy = Player.opponent_player(player_to_win)

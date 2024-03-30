@@ -81,10 +81,10 @@ class State:
         return nstate
 
     def check_winner(self):
-        if np.count_nonzero(self.get_board_matrix() == Player.BLACK) == 0:
-            return Player.WHITE
-        if np.count_nonzero(self.get_board_matrix() == Player.WHITE) == 0:
+        if self.get_num_pieces(Player.WHITE) == 0:
             return Player.BLACK
+        if self.get_num_pieces(Player.BLACK) == 0:
+            return Player.WHITE
         return Player.EMPTY
 
     def game_over(self):
@@ -132,8 +132,8 @@ class State:
                 end = time.time()
                 time_black += end - start
 
-        if self.count == DRAW_COUNTER_THRESHOLD:
-            # if X moves have passed without a capture, the game is a draw
+        if self.count == DRAW_COUNTER_THRESHOLD and log_states:
+            # if X moves have passed without a capture, the game is a draw (in our simulations)
             print(f"Draw by {DRAW_COUNTER_THRESHOLD} moves rule (no captures)")
 
         if log_states:

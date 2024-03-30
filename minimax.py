@@ -10,6 +10,7 @@ from moves.move import Move
 from player import Player
 from state import State
 
+EPS = 1e-9
 
 def get_random_move(state: State) -> Move | None:
     moves = state.get_available_moves()
@@ -54,7 +55,7 @@ def minimax(state: State, depth, alpha, beta, player_to_win, evaluate_func):
 
 def get_minimax_move(evaluate_func, depth: int) -> Move | None:
     def get_minimax_move_aux(state: State) -> Move:
-        best_move = None
+        best_moves = []
 
         alpha = best_eval = -math.inf
         beta = math.inf
@@ -66,9 +67,15 @@ def get_minimax_move(evaluate_func, depth: int) -> Move | None:
 
             if nstate_eval > best_eval:
                 alpha = best_eval = nstate_eval
-                best_move = mv
+                best_moves.clear()
+                best_moves.append(mv)
 
-        return best_move
+            if best_eval - EPS <= nstate_eval <= best_eval + EPS:   # float equality
+                best_moves.append(mv)
+
+        if best_moves != []:
+            return random.choice(best_moves)
+        return None
 
     return get_minimax_move_aux
 

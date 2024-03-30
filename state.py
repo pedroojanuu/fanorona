@@ -100,6 +100,7 @@ class State:
         ai_white: Callable[["State"], bool],
         ai_black: Callable[["State"], bool],
         log_states: bool = False,
+        log_number_of_moves: bool = False,
     ) -> Player:
         """
         Run the AI players in the game until it is over.
@@ -113,7 +114,9 @@ class State:
         - The winner of the game.
         """
         time_white, time_black = 0, 0
+        number_of_moves = 0
         while not self.game_over():
+            number_of_moves += 1
             if log_states:
                 print()
                 print(self.get_available_moves())
@@ -140,5 +143,8 @@ class State:
 
         if log_states:
             print(f"Winner: {winner}")
+
+        if log_number_of_moves:
+            print(f"Number of moves: {number_of_moves}")
 
         return winner, time_white, time_black

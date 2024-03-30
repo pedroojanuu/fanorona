@@ -47,6 +47,27 @@ def play_one_game(state: State, mcts1: MonteCarloTree, no_rollouts1, mcts2: Mont
     
     return state.run_ais(ai_white, ai_black)
 
+def play_one_game_random(state: State, mcts: MonteCarloTree, no_rollouts):
+    state = deepcopy(state)
+    def ai_white(state: State) -> State:
+        mcts.train_until(no_rollouts)
+        move_to_exe = mcts.get_best_move()
+        if(move_to_exe not in state.get_available_moves()):
+            raise Exception("Invalid move: ", move_to_exe, " in ", state.get_available_moves())
+        mcts.update_move(move_to_exe)
+        return state.execute_move(move_to_exe)
+    
+    def ai_black(state: State) -> State:
+        move_to_exe = np.random.choice(state.get_available_moves())
+        if(move_to_exe not in state.get_available_moves()):
+            raise Exception("Invalid move: ", move_to_exe, " in ", state.get_available_moves())
+        mcts.update_move(move_to_exe)
+        return state.execute_move(move_to_exe)
+    
+    print("Starting game")
+    
+    return state.run_ais(ai_white, ai_black)
+
 def play_n_games(boardWidth, boardHeight, mcts1: MonteCarloTree, no_rollouts1, mcts2: MonteCarloTree, no_rollouts2, nr: int):
     wins = {}
     time1_total = 0
@@ -121,10 +142,87 @@ def test_better_vs_heuristic(nr: int):
     print(f"Time for quick: {time1}")
     print(f"Time for better: {time2}")
 
+def test_quick_vs_random(nr: int):
+    print("MCTS Quick vs Random")
+    boardWidth = 9
+    boardHeight = 5
+    mcts = MonteCarloTree.from_player(boardWidth, boardHeight, Player.WHITE)
+    wins = {}
+    time1_total = 0
+    time2_total = 0
+    for _ in range(nr):
+        state = State(boardWidth, boardHeight)
+        mcts_copy = deepcopy(mcts)
+
+        winner, time1, time2 = play_one_game_random(state, mcts_copy, 100)
+
+        wins[winner] = wins.get(winner, 0) + 1
+        time1_total += time1
+        time2_total += time2
+
+    print(wins)
+    print(f"Time for quick: {time1_total}")
+    print(f"Time for random: {time2_total}")
+
+def test_better_vs_random(nr: int):
+    print("MCTS Better vs Random")
+    boardWidth = 9
+    boardHeight = 5
+    mcts = MonteCarloTree.from_player(boardWidth, boardHeight, Player.WHITE)
+    wins = {}
+    time1_total = 0
+    time2_total = 0
+    for _ in range(nr):
+        state = State(boardWidth, boardHeight)
+        mcts_copy = deepcopy(mcts)
+
+        winner, time1, time2 = play_one_game_random(state, mcts_copy, 1000)
+
+        wins[winner] = wins.get(winner, 0) + 1
+        time1_total += time1
+        time2_total += time2
+
+    print(wins)
+    print(f"Time for better: {time1_total}")
+    print(f"Time for random: {time2_total}")
+
+def test_heuristic_vs_random(nr: int):
+    print("MCTS Better vs Random")
+    boardWidth = 9
+    boardHeight = 5
+    h = HeuristicsList(
+        heuristics=np.array([
+            WinHeuristic(),
+            NrPiecesHeuristic(),
+            AdjacentPiecesHeuristic(),
+            GroupsHeuristic(),
+            CenterControlHeuristic(),
+        ]),
+        weights=np.array([100000, 50, 25, 10, 5]),
+    )
+    mcts = MonteCarloTreeHeuristic.from_player(h, boardWidth, boardHeight, Player.WHITE)
+    wins = {}
+    time1_total = 0
+    time2_total = 0
+    for _ in range(nr):
+        state = State(boardWidth, boardHeight)
+        mcts_copy = deepcopy(mcts)
+
+        winner, time1, time2 = play_one_game_random(state, mcts_copy, 1000)
+
+        wins[winner] = wins.get(winner, 0) + 1
+        time1_total += time1
+        time2_total += time2
+    
+    print(wins)
+    print(f"Time for better: {time1_total}")
+    print(f"Time for random: {time2_total}")
+
+
 if __name__ == "__main__":
     nr = 20  # The same for all to allow easy time comparison
-    test_quick_vs_better(nr)
-    test_quick_vs_heuristic(nr)
-    test_better_vs_heuristic(nr)
+    test_quick_vs_random(nr)
+    test_better_vs_random(nr)
+    test_heuristic_vs_random(nr)
     
 

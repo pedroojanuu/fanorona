@@ -24,28 +24,31 @@ from monte_carlo_tree_search.tree_heuristics import MonteCarloTreeHeuristic
 import time
 
 heuristicList = [
-    NrPiecesHeuristic(),
-    AdjacentPiecesHeuristic(),
-    WinHeuristic(),
-    GroupsHeuristic(),
-    CenterControlHeuristic(),
-    ApproximateEnemyHeuristic(),
-    HeuristicsList(
-        heuristics=np.array([
-            WinHeuristic(),
-            NrPiecesHeuristic(),
-            AdjacentPiecesHeuristic(),
-            GroupsHeuristic(),
-            CenterControlHeuristic(),
-        ]),
-        weights=np.array([100000, 50, 25, 10, 5]),
-    )
+#    NrPiecesHeuristic(),
+#    AdjacentPiecesHeuristic(),
+#    WinHeuristic(),
+#    GroupsHeuristic(),
+#    CenterControlHeuristic(),
+   ApproximateEnemyHeuristic(),
+    # HeuristicsList(
+    #     heuristics=np.array([
+    #         WinHeuristic(),
+    #         NrPiecesHeuristic(),
+    #         AdjacentPiecesHeuristic(),
+    #         GroupsHeuristic(),
+    #         CenterControlHeuristic(),
+    #     ]),
+    #     weights=np.array([100000, 50, 25, 10, 5]),
+    # )
 ]
 
 def test_mcts_heuristic_minimax(nr, heuristic, boardWidth=9, boardHeight=5):
     mcts = MonteCarloTreeHeuristic.from_player(
             heuristic, boardWidth, boardHeight, Player.WHITE
         )
+    # mcts = MonteCarloTree.from_player(
+    #         boardWidth, boardHeight, Player.BLACK
+    #     )
     minimax = get_minimax_move(heuristic.evaluate_board, 2)
     state = State(boardWidth, boardHeight)
 
@@ -66,7 +69,8 @@ def test_mcts_heuristic_minimax(nr, heuristic, boardWidth=9, boardHeight=5):
         state = State(boardWidth, boardHeight)
         mcts.reset_game()
 
-        winner, time1, time2 = state.run_ais(ai_white, ai_black, True)
+        print("Starting game")
+        winner, time1, time2 = state.run_ais(ai_white, ai_black, False, True)
 
         wins[winner] = wins.get(winner, 0) + 1
         time1_total += time1
@@ -86,4 +90,4 @@ def all_test_mcts_heuristic_minimax(nr: int):
 
 if __name__ == "__main__":
     # test_nr_pieces_vs_mcts_quick()
-    all_test_mcts_heuristic_minimax(100)
+    all_test_mcts_heuristic_minimax(5)

@@ -21,6 +21,8 @@ def test_win_heuristic():
 
     s.get_board_matrix().fill(Player.EMPTY) # clear the board
     s.get_board_matrix()[0][0] = Player.WHITE
+    s.white_pieces_count = 1
+    s.black_pieces_count = 0
     print(s.get_board_matrix())
 
     white_eval = h.evaluate_board(s, Player.WHITE)

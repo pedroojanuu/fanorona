@@ -3,9 +3,9 @@ import numpy as np
 from state import State
 from player import Player
 from enum import Enum
-from time import sleep
 
 import minimax
+from minimax import get_random_move
 from heuristics.heuristic import Heuristic
 from heuristics.nr_pieces_heuristic import NrPiecesHeuristic
 from heuristics.adjacent_pieces_heuristic import AdjacentPiecesHeuristic
@@ -46,19 +46,22 @@ class WindowState(Enum):
 
 class PlayerModes(Enum):
     HUMAN = 0
-    MINIMAX_VERY_EASY = 1
-    MINIMAX_EASY = 2
-    MINIMAX_DEFENSIVE_EASY = 3
-    MINIMAX_DEFENSIVE_HARD = 4
-    MINIMAX_AGRESSIVE_EASY = 5
-    MINIMAX_AGRESSIVE_HARD = 6
-    MCTS_QUICK = 7
-    MCTS_BETTER = 8
-    MCTS_HEURISTICS = 9
+    RANDOM = 1
+    MINIMAX_VERY_EASY = 2
+    MINIMAX_EASY = 3
+    # MINIMAX_MEDIUM = 3
+    MINIMAX_DEFENSIVE_EASY = 4
+    MINIMAX_DEFENSIVE_HARD = 5
+    MINIMAX_AGRESSIVE_EASY = 6
+    MINIMAX_AGRESSIVE_HARD = 7
+    MCTS_QUICK = 8
+    MCTS_BETTER = 9
+    MCTS_HEURISTICS = 10
 
     def __str__(self):
         arr = [
             "Humano",
+            "Aleatório",
             "Minimax (Muito Fácil)",
             "Minimax (Fácil)",
             "Minimax (Defensivo Fácil)",
@@ -288,7 +291,7 @@ class Game:
         elif self.window_state == WindowState.BLACK_MODE_SEL:
             textList += [
                 self.font.render(
-                    size_str + f"   Branco: {self.whiteTypeStr}", True, BLACK_COLOR
+                    size_str + f"  Branco: {self.whiteTypeStr}", True, BLACK_COLOR
                 ),
                 self.font.render("Selecione o modo da equipa preta", True, BLACK_COLOR),
             ]
@@ -300,19 +303,21 @@ class Game:
 
     def choose_alg(self, mode: PlayerModes, player: Player):
         match mode:
+            case PlayerModes.RANDOM:
+                return get_random_move
             case PlayerModes.MINIMAX_VERY_EASY:
                 return minimax.get_minimax_move(
                     HeuristicsList(
                         np.array([WinHeuristic(), ApproximateEnemyHeuristic()]),
-                        np.array([100000, 1]),
+                        np.array([1e6, 1]),
                     ).evaluate_board,
                     2,
                 )
             case PlayerModes.MINIMAX_EASY:
                 return minimax.get_minimax_move(
                     HeuristicsList(
-                        np.array([NrPiecesHeuristic(), ApproximateEnemyHeuristic()]),
-                        np.array([50, 1]),
+                        np.array([WinHeuristic(), NrPiecesHeuristic()]),
+                        np.array([1e6, 1]),
                     ).evaluate_board,
                     2,
                 )
@@ -321,13 +326,14 @@ class Game:
                     HeuristicsList(
                         np.array(
                             [
+                                WinHeuristic(),
                                 NrPiecesHeuristic(),
                                 GroupsHeuristic(),
                                 AdjacentPiecesHeuristic(),
                                 CenterControlHeuristic(),
                             ]
                         ),
-                        np.array([10, 2, 1, 1]),
+                        np.array([1e6, 10, 2, 1, 1]),
                     ).evaluate_board,
                     2,
                 )
@@ -336,33 +342,33 @@ class Game:
                     HeuristicsList(
                         np.array(
                             [
+                                WinHeuristic(),
                                 NrPiecesHeuristic(),
                                 GroupsHeuristic(),
-                                AdjacentPiecesHeuristic(),
                                 CenterControlHeuristic(),
                             ]
                         ),
-                        np.array([10, 2, 1, 1]),
+                        np.array([1e6, 10, 1, 1]),
                     ).evaluate_board,
                     4,
                 )
             case PlayerModes.MINIMAX_AGRESSIVE_EASY:
                 return minimax.get_minimax_move(
                     HeuristicsList(
-                        np.array([NrPiecesHeuristic(), ApproximateEnemyHeuristic()]),
-                        np.array([2, 1]),
+                        np.array([WinHeuristic(), NrPiecesHeuristic(), ApproximateEnemyHeuristic()]),
+                        np.array([1e6, 10, 2]),
                     ).evaluate_board,
                     2,
                 )
             case PlayerModes.MINIMAX_AGRESSIVE_HARD:
                 return minimax.get_minimax_move(
                     HeuristicsList(
-                        np.array([NrPiecesHeuristic(), ApproximateEnemyHeuristic()]),
-                        np.array([10, 2]),
+                        np.array([WinHeuristic(), NrPiecesHeuristic(), ApproximateEnemyHeuristic()]),
+                        np.array([1e6, 2, 1]),
                     ).evaluate_board,
                     4,
                 )
-            case PlayerModes.MCTS_QUICK, PlayerModes.MCTS_BETTER:
+            case PlayerModes.MCTS_QUICK | PlayerModes.MCTS_BETTER:
                 return MonteCarloTree.from_player(self.width, self.height, player)
             case PlayerModes.MCTS_HEURISTICS:
                 return MonteCarloTreeHeuristic.from_player(
@@ -585,6 +591,8 @@ class Game:
             or mode == PlayerModes.MINIMAX_AGRESSIVE_EASY
             or mode == PlayerModes.MINIMAX_AGRESSIVE_HARD
         )
+    def is_random(self, mode):
+        return mode == PlayerModes.RANDOM
 
     def is_mcts(self, mode):
         return (
@@ -689,7 +697,7 @@ class Game:
                         return
 
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-                    if self.is_minimax(mode):
+                    if self.is_minimax(mode) or self.is_random(mode):
                         move = alg(self.game_state)
                         self.game_state = self.game_state.execute_move(move)
                         break

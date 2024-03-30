@@ -1,7 +1,5 @@
 
-# import pygame
 import numpy as np
-import math
 from typing import List
 
 from adjacent_positions import ADJACENT_4, ADJACENT_ALL
@@ -138,7 +136,6 @@ class Board:
         print(self.board)
 
 if __name__ == '__main__':
-    # b = Board()
     c = Board(9, 6)
     print(c.get_all_moves(Player.WHITE))
 

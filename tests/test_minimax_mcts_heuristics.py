@@ -23,36 +23,33 @@ from monte_carlo_tree_search.tree_heuristics import MonteCarloTreeHeuristic
 import time
 
 heuristicList = [
-#    NrPiecesHeuristic(),
-#    AdjacentPiecesHeuristic(),
-#    WinHeuristic(),
-#    GroupsHeuristic(),
-#    CenterControlHeuristic(),
+   NrPiecesHeuristic(),
+   AdjacentPiecesHeuristic(),
+   WinHeuristic(),
+   GroupsHeuristic(),
+   CenterControlHeuristic(),
    ApproximateEnemyHeuristic(),
-    # HeuristicsList(
-    #     heuristics=np.array([
-    #         WinHeuristic(),
-    #         NrPiecesHeuristic(),
-    #         AdjacentPiecesHeuristic(),
-    #         GroupsHeuristic(),
-    #         CenterControlHeuristic(),
-    #     ]),
-    #     weights=np.array([100000, 50, 25, 10, 5]),
-    # )
+    HeuristicsList(
+        heuristics=np.array([
+            WinHeuristic(),
+            NrPiecesHeuristic(),
+            AdjacentPiecesHeuristic(),
+            GroupsHeuristic(),
+            CenterControlHeuristic(),
+        ]),
+        weights=np.array([100000, 50, 25, 10, 5]),
+    )
 ]
 
 def test_mcts_heuristic_minimax(nr, heuristic, boardWidth=9, boardHeight=5):
     mcts = MonteCarloTreeHeuristic.from_player(
             heuristic, boardWidth, boardHeight, Player.WHITE
         )
-    # mcts = MonteCarloTree.from_player(
-    #         boardWidth, boardHeight, Player.BLACK
-    #     )
-    minimax = get_minimax_move(heuristic.evaluate_board, 2)
+    minimax = get_minimax_move(heuristic.evaluate_board, 6)
     state = State(boardWidth, boardHeight)
 
     def ai_white(state: State) -> State:
-        mcts.train_until(1000)
+        mcts.train_until(2000)
         move = mcts.get_best_move()
         mcts.update_move(move)
         return state.execute_move(move)
@@ -88,5 +85,4 @@ def all_test_mcts_heuristic_minimax(nr: int):
     
 
 if __name__ == "__main__":
-    # test_nr_pieces_vs_mcts_quick()
-    all_test_mcts_heuristic_minimax(5)
+    all_test_mcts_heuristic_minimax(20)

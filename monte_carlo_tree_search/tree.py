@@ -124,8 +124,6 @@ if __name__ == '__main__':
     start = time.time()
 
     mcts = MonteCarloTree.from_player(9, 5, Player.WHITE)
-    # mcts.train(1000)
-    # mcts.train_time(5)
     mcts.print_tree()
     play_simulation(State(9, 5), mcts, 1000)
 

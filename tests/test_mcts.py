@@ -221,7 +221,7 @@ def test_heuristic_vs_random(nr: int):
 
 
 if __name__ == "__main__":
-    nr = 20  # The same for all to allow easy time comparison
+    nr = 20  
     test_quick_vs_random(nr)
     test_better_vs_random(nr)
     test_heuristic_vs_random(nr)

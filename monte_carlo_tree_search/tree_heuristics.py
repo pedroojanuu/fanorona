@@ -53,7 +53,6 @@ if __name__ == '__main__':
     )
 
     mctsh = MonteCarloTreeHeuristic(heuristic=h, boardWidth=10, boardHeight=10, cWhite=2, cBlack=10)
-    # mcts.train_time(5)
     play_simulation(State(10, 10), mctsh, 1000)
 
     print("Time: ", time.time() - start)

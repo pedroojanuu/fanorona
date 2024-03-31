@@ -52,6 +52,11 @@ class MonteCarloNode:
     def expand(self):
         self.expanded = True
         moves = self.state.get_available_moves()
+        if len(moves) == 0:
+            self.state = self.state.execute_move(None)
+            self.Player = Player.opponent_player(self.player)
+            return self
+
         self.children = np.empty(len(moves), dtype=object)
 
         for i in range(len(moves)):
@@ -91,15 +96,12 @@ class MonteCarloNode:
             node, move = node.select_child()
         
         if node.game_finished:
-            # print(" ----------- Winner: ", node.state.check_winner())
             node.backpropagate(node.state.check_winner())
         elif not node.expanded:
             new_node = node.expand()
             node.delete_state()
             winner = new_node.rollout()
-            # print(" ----------- Rolllout: ", winner)
             new_node.backpropagate(winner)
         else:
             winner = node.rollout()
-            # print(" ----------- Rolllout: ", winner)
             node.backpropagate(winner)

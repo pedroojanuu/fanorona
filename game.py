@@ -605,8 +605,10 @@ class Game:
         match mode:
             case PlayerModes.MCTS_QUICK:
                 alg.train_until(100)
-            case PlayerModes.MCTS_BETTER, PlayerModes.MCTS_HEURISTICS:
+            case PlayerModes.MCTS_BETTER:
                 alg.train_until(1000)
+            case PlayerModes.MCTS_HEURISTICS:
+                alg.train_until(2000)
 
     def get_current_npc(self):
         if self.game_state.player == Player.WHITE:

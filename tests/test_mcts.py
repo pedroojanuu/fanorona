@@ -8,21 +8,17 @@ import numpy as np
 from copy import deepcopy
 
 from tests.test import test
-from state import State, DRAW_COUNTER_THRESHOLD
+from state import State
 from player import Player
-from game import Game
-from heuristics.heuristic import Heuristic
 from heuristics.nr_pieces_heuristic import NrPiecesHeuristic
 from heuristics.adjacent_pieces_heuristic import AdjacentPiecesHeuristic
 from heuristics.heuristics_list import HeuristicsList
 from heuristics.win_heuristic import WinHeuristic
 from heuristics.groups_heuristic import GroupsHeuristic
 from heuristics.center_control_heuristic import CenterControlHeuristic
-from heuristics.approximate_enemy_heuristic import ApproximateEnemyHeuristic
 
 from monte_carlo_tree_search.tree import MonteCarloTree
 from monte_carlo_tree_search.tree_heuristics import MonteCarloTreeHeuristic
-import time
 
 def play_one_game(state: State, mcts1: MonteCarloTree, no_rollouts1, mcts2: MonteCarloTree, no_rollouts2):
     state = deepcopy(state)

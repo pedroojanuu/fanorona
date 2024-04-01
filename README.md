@@ -52,6 +52,10 @@ Para terminar a qualquer momento, basta premir a tecla ESC ou fechar a janela do
 >- To exit at any time, press the ESC key or close pygame window.
 
 
+```bash
+python3 game.py # inside the folder where the file is located
+```
+
 ***
 
 Grupo A1_22, março de 2024

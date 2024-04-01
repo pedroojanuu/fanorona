@@ -36,6 +36,8 @@ MIN_SIZE, MAX_SIZE = 5, 10
 
 
 class WindowState(Enum):
+    """Enum to represent the current state of the window (program)"""
+
     BOARD_SIZE_SEL = 0
     WHITE_MODE_SEL = 1
     BLACK_MODE_SEL = 2
@@ -44,6 +46,8 @@ class WindowState(Enum):
 
 
 class PlayerModes(Enum):
+    """Enum to represent the different playing modes of a team"""
+
     HUMAN = 0
     RANDOM = 1
     MINIMAX_VERY_EASY = 2
@@ -74,6 +78,8 @@ class PlayerModes(Enum):
 
 
 class Game:
+    """Class to represent the game and the window"""
+
     DEFAULT_WIDTH = 7
     DEFAULT_HEIGHT = 7
 
@@ -92,8 +98,8 @@ class Game:
         return self.get_canvas_height(self.DEFAULT_HEIGHT)
 
     def __init__(self):
+        # Set up the window
         pygame.init()
-
         self.change_canvas_size(self.DEFAULT_WIDTH, self.DEFAULT_HEIGHT)
         self.canvas.fill(BG_RED_COLOR)  # Background
         self.font = pygame.font.Font("freesansbold.ttf", 15)
@@ -168,15 +174,21 @@ class Game:
         self.selected_moves = []
 
     def back_to_white_mode_sel(self):
+        """Go back to the white team's mode selection screen"""
+
         self.white_mode = None
         self.window_state = WindowState.WHITE_MODE_SEL
 
     def back_to_black_mode_sel(self):
+        """Go back to the black team's mode selection screen"""
+
         self.black_mode = None
         self.change_canvas_size(self.DEFAULT_WIDTH, self.DEFAULT_HEIGHT)
         self.window_state = WindowState.BLACK_MODE_SEL
 
     def back_to_board_size_sel(self, from_game_over):
+        """Go back to the board size selection screen"""
+
         def func():
             if from_game_over:
                 self.winner = Player.EMPTY
@@ -228,6 +240,7 @@ class Game:
         return func
 
     def change_canvas_size(self, width, height):
+        """Changes pygame's window (canvas) size"""
         self.canvas = pygame.display.set_mode(
             (self.get_canvas_width(width), self.get_canvas_height(height))
         )
@@ -242,6 +255,7 @@ class Game:
         return func
 
     def check_exit_event(self, event):
+        """Checks if a pygame event is an exit event and exits the program if so"""
         if event.type == pygame.QUIT or (
             event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE
         ):
@@ -249,6 +263,8 @@ class Game:
             exit()
 
     def size_sel(self):
+        """Draws the board size selection screen and handles its logic"""
+
         self.canvas.fill(BG_RED_COLOR)  # Background
         self.canvas.blit(self.size_sel_title, self.size_sel_title_rect)
 
@@ -300,6 +316,8 @@ class Game:
             self.canvas.blit(text, textRect)
 
     def choose_alg(self, mode: PlayerModes, player: Player):
+        """Returns the algorithm, correctly initialized, to be used by a team according to the mode selected"""
+
         match mode:
             case PlayerModes.RANDOM:
                 return get_random_move
@@ -387,6 +405,8 @@ class Game:
                 )
 
     def mode_sel(self):
+        """Draws the mode selection screen and handles the mode selection logic"""
+
         self.canvas.fill(BG_RED_COLOR)  # Background
         self.draw_mode_sel_text()
 
@@ -631,6 +651,7 @@ class Game:
         return self.font.render("Pressione Enter para continuar", True, color)
 
     def draw_playing_text(self):
+        """Draws text indicating current player's turn"""
         textList = []
         if self.game_state.player == Player.BLACK:
             if self.black_mode == PlayerModes.HUMAN:
@@ -660,6 +681,8 @@ class Game:
             self.canvas.blit(text, textRect)
 
     def board(self):
+        """Draws the board and handles the game logic"""
+
         back_button = self.get_back_button()
 
         self.canvas.fill(BG_RED_COLOR)  # Background
@@ -727,6 +750,8 @@ class Game:
         self.canvas.blit(text, textRect)
 
     def game_over(self):
+        """Draws the game over screen"""
+
         self.canvas.fill(BG_RED_COLOR)  # Background
 
         color = None
@@ -758,6 +783,8 @@ class Game:
                     return
 
     def play(self):
+        """Handles program main loop, calling drawers/handlers according to the current state"""
+
         while True:
             if self.window_state == WindowState.PLAYING:
                 self.winner = self.game_state.check_winner()

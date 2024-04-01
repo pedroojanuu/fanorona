@@ -1,14 +1,9 @@
 import random
 import math
-from heuristics.nr_pieces_heuristic import NrPiecesHeuristic
-from heuristics.adjacent_pieces_heuristic import AdjacentPiecesHeuristic
-from heuristics.heuristics_list import HeuristicsList
-from heuristics.win_heuristic import WinHeuristic
-from heuristics.groups_heuristic import GroupsHeuristic
-from heuristics.center_control_heuristic import CenterControlHeuristic
 from moves.move import Move
 from player import Player
 from state import State
+from typing import Callable
 
 EPS = 1e-9
 
@@ -24,7 +19,7 @@ def execute_random_move(state: State) -> State:
     return state
 
 
-def minimax(state: State, depth, alpha, beta, player_to_win, evaluate_func):
+def minimax(state: State, depth, alpha, beta, player_to_win, evaluate_func: Callable[[State, Player], float]):
     if depth == 0 or state.check_winner() != Player.EMPTY:
         return evaluate_func(state, player_to_win)
 

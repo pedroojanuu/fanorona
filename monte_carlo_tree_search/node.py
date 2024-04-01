@@ -1,5 +1,4 @@
 from player import Player
-from copy import deepcopy
 import random
 import math
 import numpy as np

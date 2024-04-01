@@ -11,6 +11,12 @@ from board import Player
 
 
 class CenterControlHeuristic(Heuristic):
+    """
+    Heuristic that values proximity to the center.
+    
+    A state where the player's pieces are closer to the center and the adversary's are farther is desirable by this heuristic.
+    """
+
     def evaluate_board(self, state: State, player_to_win: Player):
         rowMiddle = state.get_board_matrix().shape[0] // 2
         colMiddle = state.get_board_matrix().shape[1] // 2

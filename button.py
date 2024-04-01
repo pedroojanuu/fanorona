@@ -1,6 +1,10 @@
 import pygame
 
 class Button:
+    """
+    Button for the pygame interface.
+    """
+
     RECT_PADDING = 10
     RECT_BORDER_RADIUS = 4
 

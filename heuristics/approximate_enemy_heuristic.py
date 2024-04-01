@@ -3,12 +3,14 @@ import numpy as np
 if __name__ == "__main__":
     import sys
     import os
+
     sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from heuristics.heuristic import Heuristic
 from player import Player
 from state import State
 from board import Player
+
 
 class ApproximateEnemyHeuristic(Heuristic):
     """

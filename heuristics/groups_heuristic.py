@@ -1,6 +1,7 @@
 if __name__ == "__main__":
     import os
     import sys
+
     sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from heuristics.heuristic import Heuristic
@@ -12,9 +13,15 @@ import numpy as np
 
 
 class GroupsHeuristic(Heuristic):
-    def flood_fill(
-        self, board: Board, row, col, player: Player, visited: np.ndarray
-    ):
+    """
+    Heuristic that values separating pieces from each other.
+
+    A state where all the opponent's pieces are in a "group" and the player's pieces are all separated is desirable by this heuristic.
+    
+    A group is defined as a set of adjacent pieces (horizontally, vertically or diagonally)
+    """
+
+    def flood_fill(self, board: Board, row, col, player: Player, visited: np.ndarray):
         if (
             not board.inside_board(row, col)
             or visited[row][col]

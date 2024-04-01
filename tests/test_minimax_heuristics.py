@@ -3,14 +3,10 @@ import os
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-
-import numpy as np
-
 from tests.test import test
 from state import State
 from player import Player
 from game import Game
-from heuristics.heuristic import Heuristic
 from heuristics.nr_pieces_heuristic import NrPiecesHeuristic
 from heuristics.adjacent_pieces_heuristic import AdjacentPiecesHeuristic
 from heuristics.heuristics_list import HeuristicsList
@@ -309,7 +305,7 @@ def test_best_heuristic_pieces_vs_pieces_approx_enemy(nr: int, depth_nr_pieces: 
 
 
 if __name__ == "__main__":
-    nr = 5000  # The same for all to allow easy time comparison
+    nr = 100
     # test_random_vs_random(nr)
 
     # test_random_vs_pieces(nr)

@@ -9,7 +9,13 @@ from state import State
 from board import Player
 
 class NrPiecesHeuristic(Heuristic):
-    def evaluate_board(self, state: State, player_to_win: Player):
+    """
+    Heuristic that values the amount of pieces each player has.
+
+    This heuristic gives an higher evaluation for the player with more pieces.
+    """
+
+    def evaluate_board(self, state: State, player_to_win: Player) -> float:
         adversary = Player.opponent_player(player_to_win)
         my_num_pieces = state.get_num_pieces(player_to_win)
         enemy_num_pieces = state.get_num_pieces(adversary)

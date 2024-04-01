@@ -1,12 +1,11 @@
 import pygame
 import numpy as np
-from state import State
-from player import Player
 from enum import Enum
 
+from state import State
+from player import Player
 import minimax
 from minimax import get_random_move
-from heuristics.heuristic import Heuristic
 from heuristics.nr_pieces_heuristic import NrPiecesHeuristic
 from heuristics.adjacent_pieces_heuristic import AdjacentPiecesHeuristic
 from heuristics.heuristics_list import HeuristicsList
@@ -49,7 +48,6 @@ class PlayerModes(Enum):
     RANDOM = 1
     MINIMAX_VERY_EASY = 2
     MINIMAX_EASY = 3
-    # MINIMAX_MEDIUM = 3
     MINIMAX_DEFENSIVE_EASY = 4
     MINIMAX_DEFENSIVE_HARD = 5
     MINIMAX_AGRESSIVE_EASY = 6

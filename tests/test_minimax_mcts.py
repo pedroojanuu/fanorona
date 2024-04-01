@@ -19,7 +19,7 @@ from heuristics.groups_heuristic import GroupsHeuristic
 from heuristics.center_control_heuristic import CenterControlHeuristic
 from heuristics.approximate_enemy_heuristic import ApproximateEnemyHeuristic
 
-from minimax import execute_minimax_move, get_minimax_move
+from minimax import get_minimax_move
 from monte_carlo_tree_search.tree import MonteCarloTree
 from monte_carlo_tree_search.tree_heuristics import MonteCarloTreeHeuristic
 

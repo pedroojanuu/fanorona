@@ -2,6 +2,10 @@ from enum import Enum
 
 
 class AdjacentPosition(Enum):
+    """
+    Enum representing adjacent positions.
+    """
+
     UP = (1, 0)
     DOWN = (-1, 0)
     RIGHT = (0, 1)
@@ -15,7 +19,7 @@ class AdjacentPosition(Enum):
         return self.value
 
 
-ADJACENT_4 = list(
+ADJACENT_4 = list(  # horizontal and vertical adjacent positions
     map(
         AdjacentPosition.helper,
         [
@@ -26,7 +30,8 @@ ADJACENT_4 = list(
         ],
     )
 )
-ADJACENT_RIGHT = list(
+
+ADJACENT_RIGHT = list(  # all adjacent positions to the right, including diagonal and vertical adjacencies
     map(
         AdjacentPosition.helper,
         [
@@ -38,7 +43,8 @@ ADJACENT_RIGHT = list(
         ],
     )
 )
-ADJACENT_ALL = list(
+
+ADJACENT_ALL = list(  # all adjacent positions (horizontal, vertical and diagonal)
     map(
         AdjacentPosition.helper,
         [

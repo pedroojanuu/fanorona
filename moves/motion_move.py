@@ -2,6 +2,9 @@ from moves.move import Move
 from player import Player
 
 class MotionMove(Move):
+    """
+    Move that leads to movement of a piece.
+    """
     def __init__(self, row_origin, col_origin, row_destination, col_destination):
         super().__init__()
         self.row_origin = row_origin

@@ -18,10 +18,18 @@ class Move(ABC):
 
     @abstractmethod
     def allows_multiple_moves(self) -> bool:
+        """
+        Returns a boolean representing whether the move allows multiple moves if there are subsequent moves available.
+        
+        This is used to allow multiple capturing moves in a row.
+        """
         pass
 
     @abstractmethod
     def execute(self, state):
+        """
+        Executes the move to the given state, returning a new state.
+        """
         pass
 
     @staticmethod

@@ -37,6 +37,8 @@ Para desativar o "ambiente", basta correr o comando:
 deactivate
 ```
 
+<div style="page-break-after: always;"></div>
+
 ## Execução
 
 Basta correr o ficheiro ```game.py```, presente no diretório-raiz do projeto.

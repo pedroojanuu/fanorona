@@ -188,7 +188,7 @@ def test_better_vs_random(nr: int):
     print(f"Time for random: {time2_total}")
 
 def test_heuristic_vs_random(nr: int):
-    print("MCTS Better vs Random")
+    print("MCTS Heuristic vs Random")
     boardWidth = 9
     boardHeight = 5
     h = HeuristicsList(
@@ -209,7 +209,7 @@ def test_heuristic_vs_random(nr: int):
         state = State(boardWidth, boardHeight)
         mcts_copy = deepcopy(mcts)
 
-        winner, time1, time2 = play_one_game_random(state, mcts_copy, 1000)
+        winner, time1, time2 = play_one_game_random(state, mcts_copy, 2000)
 
         wins[winner] = wins.get(winner, 0) + 1
         time1_total += time1
@@ -222,8 +222,8 @@ def test_heuristic_vs_random(nr: int):
 
 if __name__ == "__main__":
     nr = 20  
-    test_quick_vs_random(nr)
-    test_better_vs_random(nr)
+    test_quick_vs_heuristic(nr)
+    test_better_vs_heuristic(nr)
     test_heuristic_vs_random(nr)
     
 

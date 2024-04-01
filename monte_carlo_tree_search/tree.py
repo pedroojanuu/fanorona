@@ -10,6 +10,9 @@ import time
 import random
 
 class MonteCarloTree:
+    """
+    Implementation of the traditional Monte Carlo Tree Search algorithm.
+    """
     def __init__(self, boardWidth, boardHeight, cWhite=2, cBlack=2):
         self.boardWidth = boardWidth
         self.boardHeight = boardHeight
@@ -21,43 +24,70 @@ class MonteCarloTree:
 
     @classmethod
     def from_player(self, boardWidth, boardHeight, player):
+        """
+        Constructs a MonteCarloTree with the appropriate constants for the player.
+        """
         if player == Player.WHITE:
             return MonteCarloTree(boardWidth, boardHeight, 2, 10)
         else:
             return MonteCarloTree(boardWidth, boardHeight, 10, 2)
     
     def save_to_disk(self, path):
+        """
+        Saves the tree to a file.
+        """
         with open(path, 'wb') as file:
             pickle.dump(self, file, pickle.HIGHEST_PROTOCOL)
 
     @staticmethod
     def load_from_disk(path):
+        """
+        Loads a tree from a file.
+        """
         with open(path,  "rb") as f:
             return pickle.load(f)
 
     def print_tree(self):
+        """
+        Prints the tree to the console.
+        """
         self.print_tree_aux(self.root, 0)
     
     def print_tree_aux(self, node, depth):
+        """
+        Auxiliary function to print the tree.
+        """
         print(" " * 4*depth, "t:", node.total, "v:", node.visits)
         for child, move in node.children:
             print(" " * depth)
             self.print_tree_aux(child, depth + 1)
 
     def train(self, iterations):
+        """
+        Exectutes a number of rollouts on the tree.
+        """
         for _ in range(iterations):
             self.currNode.one_training_iteration()
 
     def train_time(self, timeout):
+        """
+        Executes rollouts until a certain amount of time has passed.
+        """
         start = time.time()
         while time.time() - start < timeout or not all([child.visits != 0 for child, _ in self.currNode.children]):
             self.currNode.one_training_iteration()
 
     def train_until(self, total_iterations):
+        """
+        Executes rollouts until the root node has been visited a certain amount of times.
+        """
         while self.currNode.visits < total_iterations:
             self.currNode.one_training_iteration()
         
     def get_best_move(self):
+        """
+        Based on the current tree, returns the best move.
+        """
         if not self.currNode.expanded:
             print("Warning: Tree not trained enough to get best move. Returning random move.")
             return random.choice(self.state.get_available_moves())
@@ -68,6 +98,11 @@ class MonteCarloTree:
             return min(self.currNode.children, key=lambda x: x[0].total/x[0].visits if x[0].visits != 0 else float("inf"))[1]
     
     def update_move(self, move_to_exe):
+        """
+        Updates the tree with the move that was executed, changing the node to the
+        child that corresponds to the move, and deleting the parent and siblings
+        of selected node.
+        """
         if not self.currNode.expanded:
             self.currNode.expand()
             
@@ -84,49 +119,10 @@ class MonteCarloTree:
         raise Exception("Move not found: ", move_to_exe, " in children: ", self.currNode.children)
     
     def reset_game(self):
+        """
+        Resets the the tree to the initial state.
+        """
         self.state = State(self.boardWidth, self.boardHeight)
         self.root = MonteCarloNode(None, State(self.boardWidth, self.boardHeight), self.cWhite, self.cBlack)
         self.currNode = self.root
     
-
-def play_simulation(state: State, mcts: MonteCarloTree, no_rollouts=100):
-    state.draw()
-
-    while True:
-        if state.player == Player.WHITE:
-            # mcts.train_time(0.02 * 5 * 5)
-            mcts.train_until(no_rollouts)
-            move_to_exe = mcts.get_best_move()
-            if(move_to_exe not in state.get_available_moves()):
-                raise Exception("Invalid move: ", move_to_exe, " in ", state.get_available_moves())
-            print("Best move: ", move_to_exe)
-        else:
-            print("Available moves: ", state.get_available_moves())
-            move_to_exe = random.choice(state.get_available_moves())
-        print()
-        print("Move to execute: ", move_to_exe)
-
-        print()
-        print('-'*50)
-        print()
-
-        state = state.execute_move(move_to_exe)
-        state.draw()
-
-        mcts.update_move(move_to_exe)
-        mcts.state.draw()
-        
-        if state.check_winner() != Player.EMPTY:
-            print("Winner: ", state.check_winner())
-            break
-
-if __name__ == '__main__':
-    start = time.time()
-
-    mcts = MonteCarloTree.from_player(9, 5, Player.WHITE)
-    mcts.print_tree()
-    play_simulation(State(9, 5), mcts, 1000)
-
-    print("Time: ", time.time() - start)
-
-

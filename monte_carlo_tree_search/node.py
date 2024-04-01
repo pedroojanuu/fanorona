@@ -3,20 +3,10 @@ import random
 import math
 import numpy as np
 
-def all_max(iterable, key):
-    max_value = float("-inf")
-    max_items = []
-    for item in iterable:
-        value = key(item) if key is not None else item
-        if value > max_value:
-            max_value = value
-            max_items = [item]
-        elif value == max_value:
-            max_items.append(item)
-    return max_items
-
-
 class MonteCarloNode:
+    """
+    Implementation of a Monte Carlo Tree Search node, used in the MonteCarloTree class.
+    """
     def __init__(self, parentNode, state, cWhite=2, cBlack=10):
         self.total = 0
         self.visits = 0
@@ -32,10 +22,10 @@ class MonteCarloNode:
         else:
             self.player = Player.BLACK
 
-    def add_child(self, child, move):
-        self.children.append((child, move))
-
     def ucb1(self):
+        """
+        Implementation of the UCB1 formula, used to select the best child node.
+        """
         if self.visits == 0:
             return float("inf")
         if self.parentNode.player == Player.WHITE:
@@ -44,11 +34,17 @@ class MonteCarloNode:
             return self.total / self.visits + self.cBlack * (math.log(self.parentNode.visits) / self.visits) ** 0.5
         
     def select_child(self):
+        """
+        Selects the child node with the highest UCB1 value.
+        """
         if self.children.size == 0:
             raise Exception("No children to select from")
         return max(self.children, key=lambda x: x[0].ucb1())
 
     def expand(self):
+        """
+        Expands the node by adding all possible children states.
+        """
         self.expanded = True
         moves = self.state.get_available_moves()
         if len(moves) == 0:
@@ -66,6 +62,9 @@ class MonteCarloNode:
         return random.choice(self.children)[0]
     
     def rollout(self):
+        """
+        Simulates a game from the current state until the end, and returns the winner.
+        """
         state = self.state
         while state.check_winner() == Player.EMPTY:
             available_moves = state.get_available_moves()
@@ -77,9 +76,15 @@ class MonteCarloNode:
         return state.check_winner()
     
     def delete_state(self):
+        """
+        Deletes the state of the node, to save memory.
+        """
         self.state = None
     
     def backpropagate(self, winner):
+        """
+        Backpropagates the result of a rollout up the tree.
+        """
         self.visits += 1
         if winner == Player.WHITE and self.player == Player.WHITE:
             self.total += 1
@@ -89,6 +94,10 @@ class MonteCarloNode:
             self.parentNode.backpropagate(winner)
 
     def one_training_iteration(self):
+        """
+        Executes one iteration of the Monte Carlo Tree Search algorithm, including
+        selection, expansion, rollout and backpropagation.
+        """
         node = self
 
         while node.children.size != 0 and not node.game_finished:

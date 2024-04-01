@@ -1,5 +1,7 @@
 from monte_carlo_tree_search.node import MonteCarloNode
 from player import Player
+from heuristics.heuristic import Heuristic
+from state import State
 from copy import deepcopy
 
 import random
@@ -9,7 +11,7 @@ class MonteCarloNodeHeuristic(MonteCarloNode):
     """
     Subclass of MonteCarloNode that uses an heuristic to evaluate the nodes, instead of rollouts.
     """
-    def __init__(self, heuristic, parentNode, state, cWhite, cBlack):
+    def __init__(self, heuristic: Heuristic, parentNode, state: State, cWhite: int, cBlack: int):
         super().__init__(parentNode, state, cWhite, cBlack)
         self.heuristic = heuristic
 
@@ -36,7 +38,7 @@ class MonteCarloNodeHeuristic(MonteCarloNode):
         valBlack = self.heuristic.evaluate_board(self.state, Player.BLACK)
         return (valWhite, valBlack)
     
-    def backpropagate(self, valWhite, valBlack):
+    def backpropagate(self, valWhite: int, valBlack: int):
         """
         Backpropagates the result of the heuristic evaluation up the tree.
         """

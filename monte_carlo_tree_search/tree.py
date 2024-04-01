@@ -5,6 +5,7 @@ if __name__ == '__main__':
 from monte_carlo_tree_search.node import MonteCarloNode
 from state import State
 from player import Player
+from moves.move import Move
 import pickle
 import time
 import random
@@ -13,7 +14,7 @@ class MonteCarloTree:
     """
     Implementation of the traditional Monte Carlo Tree Search algorithm.
     """
-    def __init__(self, boardWidth, boardHeight, cWhite=2, cBlack=2):
+    def __init__(self, boardWidth: int, boardHeight: int, cWhite=2, cBlack=2):
         self.boardWidth = boardWidth
         self.boardHeight = boardHeight
         self.state = State(boardWidth, boardHeight)
@@ -23,7 +24,7 @@ class MonteCarloTree:
         self.cBlack = cBlack
 
     @classmethod
-    def from_player(self, boardWidth, boardHeight, player):
+    def from_player(self, boardWidth: int, boardHeight: int, player: Player):
         """
         Constructs a MonteCarloTree with the appropriate constants for the player.
         """
@@ -32,7 +33,7 @@ class MonteCarloTree:
         else:
             return MonteCarloTree(boardWidth, boardHeight, 10, 2)
     
-    def save_to_disk(self, path):
+    def save_to_disk(self, path: str):
         """
         Saves the tree to a file.
         """
@@ -40,7 +41,7 @@ class MonteCarloTree:
             pickle.dump(self, file, pickle.HIGHEST_PROTOCOL)
 
     @staticmethod
-    def load_from_disk(path):
+    def load_from_disk(path: str):
         """
         Loads a tree from a file.
         """
@@ -53,7 +54,7 @@ class MonteCarloTree:
         """
         self.print_tree_aux(self.root, 0)
     
-    def print_tree_aux(self, node, depth):
+    def print_tree_aux(self, node: MonteCarloNode, depth: int):
         """
         Auxiliary function to print the tree.
         """
@@ -62,22 +63,23 @@ class MonteCarloTree:
             print(" " * depth)
             self.print_tree_aux(child, depth + 1)
 
-    def train(self, iterations):
+    def train(self, iterations: int):
         """
         Exectutes a number of rollouts on the tree.
         """
         for _ in range(iterations):
             self.currNode.one_training_iteration()
 
-    def train_time(self, timeout):
+    def train_time(self, timeout: float):
         """
         Executes rollouts until a certain amount of time has passed.
+        Timout is expressed in seconds.
         """
         start = time.time()
         while time.time() - start < timeout or not all([child.visits != 0 for child, _ in self.currNode.children]):
             self.currNode.one_training_iteration()
 
-    def train_until(self, total_iterations):
+    def train_until(self, total_iterations: int):
         """
         Executes rollouts until the root node has been visited a certain amount of times.
         """
@@ -97,7 +99,7 @@ class MonteCarloTree:
         else:
             return min(self.currNode.children, key=lambda x: x[0].total/x[0].visits if x[0].visits != 0 else float("inf"))[1]
     
-    def update_move(self, move_to_exe):
+    def update_move(self, move_to_exe: Move):
         """
         Updates the tree with the move that was executed, changing the node to the
         child that corresponds to the move, and deleting the parent and siblings

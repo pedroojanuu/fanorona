@@ -1,4 +1,5 @@
 from player import Player
+from state import State
 import random
 import math
 import numpy as np
@@ -7,7 +8,7 @@ class MonteCarloNode:
     """
     Implementation of a Monte Carlo Tree Search node, used in the MonteCarloTree class.
     """
-    def __init__(self, parentNode, state, cWhite=2, cBlack=10):
+    def __init__(self, parentNode, state: State, cWhite=2, cBlack=10):
         self.total = 0
         self.visits = 0
         self.parentNode = parentNode
@@ -81,7 +82,7 @@ class MonteCarloNode:
         """
         self.state = None
     
-    def backpropagate(self, winner):
+    def backpropagate(self, winner: Player):
         """
         Backpropagates the result of a rollout up the tree.
         """

@@ -8,26 +8,21 @@ from state import State
 from player import Player
 import time
 
-from heuristics.heuristics_list import HeuristicsList
-from heuristics.win_heuristic import WinHeuristic
-from heuristics.nr_pieces_heuristic import NrPiecesHeuristic
-from heuristics.adjacent_pieces_heuristic import AdjacentPiecesHeuristic
-from heuristics.groups_heuristic import GroupsHeuristic
-from heuristics.center_control_heuristic import CenterControlHeuristic
+from heuristics.heuristic import Heuristic
 import numpy as np
 
 class MonteCarloTreeHeuristic(MonteCarloTree):
     """
     Subclass of MonteCarloTree that uses an heuristic to evaluate the nodes, instead of rollouts.
     """
-    def __init__(self, heuristic, boardWidth, boardHeight, cWhite=2, cBlack=2):
+    def __init__(self, heuristic: Heuristic, boardWidth: int, boardHeight: int, cWhite=2, cBlack=2):
         super().__init__(boardWidth, boardHeight, cWhite, cBlack)
         self.root = MonteCarloNodeHeuristic(heuristic, None, State(boardWidth, boardHeight), cWhite, cBlack)
         self.currNode = self.root
         self.heuristic = heuristic
     
     @classmethod
-    def from_player(self, heuristic, boardWidth, boardHeight, player):
+    def from_player(self, heuristic: Heuristic, boardWidth: int, boardHeight: int, player: Player):
         """
         Constructs a MonteCarloTree with the appropriate constants for the player.
         """

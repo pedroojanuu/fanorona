@@ -29,6 +29,8 @@ class Move(ABC):
     def execute(self, state):
         """
         Executes the move to the given state, returning a new state.
+        
+        Should finish the player's turn if the move does not allow multiple moves or if there are no more available moves.
         """
         pass
 

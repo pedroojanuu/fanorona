@@ -1,6 +1,9 @@
 from moves.move import Move
 
 class PassMove(Move):
+    """
+    A move that represents a player passing their turn. Does not modify the board.
+    """
     def __init__(self):
         super().__init__()
 

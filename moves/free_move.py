@@ -2,6 +2,11 @@ from moves.move import Move
 from moves.motion_move import MotionMove
 
 class FreeMove(MotionMove):
+    """
+    Move that does not capture any piece.
+
+    The piece only moves 1 tile.    
+    """
     def __init__(self, row_origin, col_origin, row_destination, col_destination):
         super().__init__(row_origin, col_origin, row_destination, col_destination)
     

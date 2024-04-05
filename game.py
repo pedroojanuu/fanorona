@@ -371,7 +371,13 @@ class Game:
             case PlayerModes.MINIMAX_AGRESSIVE_EASY:
                 return minimax.get_minimax_move(
                     HeuristicsList(
-                        np.array([WinHeuristic(), NrPiecesHeuristic(), ApproximateEnemyHeuristic()]),
+                        np.array(
+                            [
+                                WinHeuristic(),
+                                NrPiecesHeuristic(),
+                                ApproximateEnemyHeuristic(),
+                            ]
+                        ),
                         np.array([1e6, 10, 2]),
                     ).evaluate_board,
                     2,
@@ -379,7 +385,13 @@ class Game:
             case PlayerModes.MINIMAX_AGRESSIVE_HARD:
                 return minimax.get_minimax_move(
                     HeuristicsList(
-                        np.array([WinHeuristic(), NrPiecesHeuristic(), ApproximateEnemyHeuristic()]),
+                        np.array(
+                            [
+                                WinHeuristic(),
+                                NrPiecesHeuristic(),
+                                ApproximateEnemyHeuristic(),
+                            ]
+                        ),
                         np.array([1e6, 2, 1]),
                     ).evaluate_board,
                     4,
@@ -564,41 +576,42 @@ class Game:
                     return
                 col = x // 70
                 row = y // 70
-                if (
-                    self.game_state.get_board_matrix()[row][col]
-                    == self.game_state.player
-                ):
-                    self.selected_piece = (row, col)
-                    self.selected_moves = []
-                elif self.game_state.get_board_matrix()[row][col] == Player.EMPTY:
-                    self.selected_moves = []
-                    for move in self.available_moves:
-                        if (
-                            isinstance(move, MotionMove)
-                            and self.selected_piece
-                            == (
-                                move.row_origin,
-                                move.col_origin,
-                            )
-                            and (row, col)
-                            == (
-                                move.row_destination,
-                                move.col_destination,
-                            )
-                        ):
-                            self.selected_moves.append(move)
+                if self.game_state.board.inside_board(row, col):
+                    if (
+                        self.game_state.get_board_matrix()[row][col]
+                        == self.game_state.player
+                    ):
+                        self.selected_piece = (row, col)
+                        self.selected_moves = []
+                    elif self.game_state.get_board_matrix()[row][col] == Player.EMPTY:
+                        self.selected_moves = []
+                        for move in self.available_moves:
+                            if (
+                                isinstance(move, MotionMove)
+                                and self.selected_piece
+                                == (
+                                    move.row_origin,
+                                    move.col_origin,
+                                )
+                                and (row, col)
+                                == (
+                                    move.row_destination,
+                                    move.col_destination,
+                                )
+                            ):
+                                self.selected_moves.append(move)
 
-                    if len(self.selected_moves) == 1:
-                        self.execute_human_move(self.selected_moves[0])
-                        pygame.display.update()
-                        return
-                else:
-                    for move in self.selected_moves:
-                        if (row, col) == move.get_first_to_kill():
-                            self.execute_human_move(move)
-                            self.selected_moves = []
+                        if len(self.selected_moves) == 1:
+                            self.execute_human_move(self.selected_moves[0])
                             pygame.display.update()
                             return
+                    else:
+                        for move in self.selected_moves:
+                            if (row, col) == move.get_first_to_kill():
+                                self.execute_human_move(move)
+                                self.selected_moves = []
+                                pygame.display.update()
+                                return
 
     def is_minimax(self, mode):
         return (
@@ -609,6 +622,7 @@ class Game:
             or mode == PlayerModes.MINIMAX_AGRESSIVE_EASY
             or mode == PlayerModes.MINIMAX_AGRESSIVE_HARD
         )
+
     def is_random(self, mode):
         return mode == PlayerModes.RANDOM
 
